@@ -4,24 +4,19 @@ import static com.left.template.utils.Log.log;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.left.template.TemplateGame;
 import com.left.template.model.TemplateModel;
-import com.left.template.utils.Res;
+import com.left.template.services.SoundManager.SoundList;
 
 /**
  * Manages the drawing of the Grid to the screen and player controls.
  * Reference: https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
-public class TemplateView implements InputProcessor, TemplateRenderable {
-
-	public static final int TILE_LENGTH = 32;
-
+public class TemplateView implements InputProcessor {
 	private final TemplateGame game;
 	private final TemplateModel gridModel;
-	
 	protected OrthographicCamera viewCamera;
 
 	// ********************
@@ -64,6 +59,7 @@ public class TemplateView implements InputProcessor, TemplateRenderable {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		game.getSound().play(SoundList.CLICK);
 		return false;
 	}
 
@@ -91,17 +87,22 @@ public class TemplateView implements InputProcessor, TemplateRenderable {
 	// ********************
 	// **** Rendering *****
 	// ********************
-	
-	private Texture texture = new Texture(Res.UI + "background.png");
+	private PlayerSprite player;
+	private EnemySprite enemy;
 
-	@Override
+	public void create() {
+		player = new PlayerSprite();
+		player.create();
+		enemy = new EnemySprite();
+		enemy.create();
+	}
+
 	public void render(SpriteBatch batch, float delta) {
-
 		batch.setProjectionMatrix(viewCamera.combined);
 		batch.begin();
-		
 		// *** RENDERING STUFF GOES HERE ***
-		batch.draw(texture, 0, 0);
+		batch.draw(player.getTextureForRender(delta), -256, 0);
+		batch.draw(enemy.getTextureForRender(delta), 128, 0);
 		batch.end();
 	}
 
@@ -111,12 +112,5 @@ public class TemplateView implements InputProcessor, TemplateRenderable {
 		viewCamera.viewportHeight = height;
 		viewCamera.position.set(0, 0, 0);
 		viewCamera.update();
-
-		//Vector3 min = MIN_BOUND.cpy();
-		//Vector3 max = new Vector3(MAX_BOUND.x - width, MAX_BOUND.y - height, 0);
-		//viewCamera.project(min, 0, 0, width, height);
-		//viewCamera.project(max, 0, 0, width, height);
-		//bounds = new BoundingBox(min, max);
-		
 	}
 }

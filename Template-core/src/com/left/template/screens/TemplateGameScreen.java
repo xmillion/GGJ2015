@@ -24,6 +24,7 @@ public class TemplateGameScreen extends AbstractScreen {
 		
 		templateModel = model;
 		templateView = new TemplateView(game, templateModel, getAtlas());
+		templateView.create();
 		uiView = new UIView(game, templateView, getAtlas(), getSkin());
 	}
 
