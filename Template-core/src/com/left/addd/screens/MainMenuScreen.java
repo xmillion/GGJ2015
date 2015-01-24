@@ -44,7 +44,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
 				game.getSound().play(SoundList.CLICK);
 				stage.getRoot().addAction(sequence(fadeOut(0.15f), run(new Runnable() {
 					public void run() {
-						game.setNextScreen(Screens.TEMPLATEGAME);
+						game.setNextScreen(Screens.GAME);
 					}
 				})));
 			}

@@ -16,7 +16,7 @@ public class GameScreen extends AbstractScreen {
 	private UIView uiView;
 
 	public GameScreen(AdddGame game) {
-		this(game, new GameModel(20, 20));
+		this(game, new GameModel(30, 20));
 	}
 	
 	public GameScreen(AdddGame game, GameModel model) {
@@ -24,7 +24,6 @@ public class GameScreen extends AbstractScreen {
 		
 		templateModel = model;
 		templateView = new GameView(game, templateModel, getAtlas());
-		templateView.create();
 		uiView = new UIView(game, templateView, getAtlas(), getSkin());
 	}
 

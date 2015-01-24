@@ -234,7 +234,7 @@ public class UIView implements Disposable {
 					@Override
 					public void pressed(InputEvent event, float x, float y, int pointer, int button) {
 						game.getSound().play(SoundList.CLICK);
-						game.setNextScreen(Screens.TEMPLATEGAME, saveSlot);
+						game.setNextScreen(Screens.GAME, saveSlot);
 					}
 				});
 

@@ -118,9 +118,8 @@ public enum TileImageType {
 			default:
 				return TileImageType.NONE;
 			}
+		} else {
+			return TileImageType.BLANK;
 		}
-		
-		// unreachable code
-		return TileImageType.NONE;
 	}
 }

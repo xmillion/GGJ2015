@@ -105,13 +105,6 @@ public class GameView implements InputProcessor {
 		this.tileImageTypes = new TileImageType[gameModel.width][gameModel.height];
 		updateAllTiles();
 	}
-	
-	public void create() {
-		player = new PlayerSprite();
-		player.create();
-		enemy = new EnemySprite();
-		enemy.create();
-	}
 
 	// ********************
 	// **** Internals *****
@@ -338,8 +331,6 @@ public class GameView implements InputProcessor {
 	// ********************
 	// **** Rendering *****
 	// ********************
-	private PlayerSprite player;
-	private EnemySprite enemy;
 	
 	public void render(SpriteBatch batch, float delta) {
 		// Pan camera
@@ -347,8 +338,6 @@ public class GameView implements InputProcessor {
 
 		batch.setProjectionMatrix(panner.getCamera().combined);
 		batch.begin();
-		batch.draw(player.getTextureForRender(delta), -256, 0);
-		batch.draw(enemy.getTextureForRender(delta), 128, 0);
 		renderTiles(batch, delta);
 		renderHover(batch, delta);
 		batch.end();

@@ -29,12 +29,12 @@ public class AdddGame extends Game implements ApplicationListener {
 	private Screens nextScreen;
 	private int nextScreenState;
 	private PreferenceManager preferenceManager;
-	private GameSerializer templateSerializer;
+	private GameSerializer gameSerializer;
 	private MusicManager musicManager;
 	private SoundManager soundManager;
 
 	public static enum Screens {
-		SPLASH, MAINMENU, OPTIONS, LOAD, TEMPLATEGAME;
+		SPLASH, MAINMENU, OPTIONS, LOAD, GAME;
 	}
 
 	public void setNextScreen(Screens s) {
@@ -64,11 +64,11 @@ public class AdddGame extends Game implements ApplicationListener {
 		case LOAD:
 			screen = new LoadScreen(this);
 			break;
-		case TEMPLATEGAME:
+		case GAME:
 			if(nextScreenState >= 0) {
 				try {
 					// Load game
-					GameModel model = templateSerializer.load(nextScreenState);
+					GameModel model = gameSerializer.load(nextScreenState);
 					screen = new GameScreen(this, model);
 				} catch (LoadingException e) {
 					// TODO show a notification on the screen
@@ -92,7 +92,7 @@ public class AdddGame extends Game implements ApplicationListener {
 	}
 	
 	public GameSerializer getSaver() {
-		return templateSerializer;
+		return gameSerializer;
 	}
 
 	public MusicManager getMusic() {
@@ -108,7 +108,7 @@ public class AdddGame extends Game implements ApplicationListener {
 		log("Create Game");
 		preferenceManager = new PreferenceManager();
 		
-		templateSerializer = new GameSerializer();
+		gameSerializer = new GameSerializer();
 
 		musicManager = new MusicManager();
 		musicManager.setEnabled(preferenceManager.isMusicOn());
