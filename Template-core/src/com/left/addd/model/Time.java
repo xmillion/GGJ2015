@@ -5,9 +5,12 @@ public class Time {
 	 * in game time units (hours)
 	 */
 	private long hours;
+	/**
+	 * Real time units (seconds)
+	 */
 	private float realTime;
 	// Conversion factor:
-	// 10 seconds = 24 hours in game
+	// 1 seconds = 1 hour in game
 	private static final float CONVERSION = 1;
 	
 	public Time() {
@@ -45,5 +48,13 @@ public class Time {
 			realTime -= CONVERSION;
 		}
 		return ticks;
+	}
+	
+	public static float getRealTimeFromTicks(int ticks) {
+		return ticks * CONVERSION;
+	}
+	
+	public static int getTicksFromRealTime(float realTime) {
+		return (int) (realTime / CONVERSION);
 	}
 }

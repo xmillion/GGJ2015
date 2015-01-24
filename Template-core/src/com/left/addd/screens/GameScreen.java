@@ -11,8 +11,8 @@ import com.left.addd.view.GameView;
 import com.left.addd.view.UIView;
 
 public class GameScreen extends AbstractScreen {
-	private GameModel templateModel;
-	private GameView templateView;
+	private GameModel gameModel;
+	private GameView gameView;
 	private UIView uiView;
 
 	public GameScreen(AdddGame game) {
@@ -22,9 +22,9 @@ public class GameScreen extends AbstractScreen {
 	public GameScreen(AdddGame game, GameModel model) {
 		super(game);
 		
-		templateModel = model;
-		templateView = new GameView(game, templateModel, getAtlas());
-		uiView = new UIView(game, templateView, getAtlas(), getSkin());
+		gameModel = model;
+		gameView = new GameView(game, gameModel, getAtlas());
+		uiView = new UIView(game, gameView, getAtlas(), getSkin());
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class GameScreen extends AbstractScreen {
 		// UI gets first priority on input events
 		InputMultiplexer inputMux = new InputMultiplexer();
 		inputMux.addProcessor(uiView.getStage());
-		inputMux.addProcessor(templateView);
+		inputMux.addProcessor(gameView);
 		Gdx.input.setInputProcessor(inputMux);
 	}
 
@@ -53,14 +53,14 @@ public class GameScreen extends AbstractScreen {
 			case PAUSE:
 				break;
 			case NORMAL:
-				templateModel.update(delta);
+				gameModel.update(delta);
 				break;
 			case FASTER:
 				// TODO set actual speeds
-				templateModel.update(delta * 2);
+				gameModel.update(delta * 2);
 				break;
 			case FASTEST:
-				templateModel.update(delta * 5);
+				gameModel.update(delta * 5);
 				break;
 			}
 		}
@@ -69,7 +69,7 @@ public class GameScreen extends AbstractScreen {
 		Gdx.gl.glClearColor(0.2f, 0f, 0.4f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		templateView.render(batch, delta);
+		gameView.render(batch, delta);
 		uiView.render(delta);
 
 		// TODO Check for game over condition
@@ -78,7 +78,7 @@ public class GameScreen extends AbstractScreen {
 	@Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
-		templateView.resize(width, height);
+		gameView.resize(width, height);
 		uiView.resize(width, height);
 	}
 

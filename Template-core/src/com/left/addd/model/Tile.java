@@ -108,6 +108,11 @@ public class Tile {
 			return gameModel.getTile(x, y);
 		}
 	}
+	
+	public Tile tryGetNeighbour(Direction dir, Tile defaultTile) {
+		Tile t = getNeighbour(dir);
+		return Tile.isDummyTile(t) ? defaultTile : t;
+	}
 
 	// *** Rules ***
 

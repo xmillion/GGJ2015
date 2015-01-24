@@ -43,7 +43,8 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		this.testEntity = new Entity("testguy", tiles[3][3], tiles[10][10]);
+		this.testEntity = new Entity("testguy", tiles[0][1], tiles[2][12]);
+		testEntity.move(Direction.NORTH);
 	}
 	
 	public Time getTime() {
@@ -113,6 +114,7 @@ public class GameModel {
 	public void update(float delta) {
 		int ticks = time.update(delta);
 		updateTiles(ticks);
+		updateEntities(ticks);
 	}
 
 	private void updateTiles(int ticks) {
@@ -121,6 +123,10 @@ public class GameModel {
 				t.update(ticks);
 			}
 		}
+	}
+	
+	private void updateEntities(int ticks) {
+		testEntity.update(ticks);
 	}
 	
 	public void save(Json json) {
