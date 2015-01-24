@@ -5,6 +5,9 @@
 *.ear
 hs_err_pid*
 
+## Game specific
+assets/data/
+
 ## GWT
 war/
 html/war/gwt_bree/
@@ -30,18 +33,12 @@ out/
 com_crashlytics_export_strings.xml
 
 ## Eclipse
-.classpath
-.project
-.metadata
 **/bin/
 tmp/
 *.tmp
 *.bak
 *.swp
 *~.nib
-local.properties
-.settings/
-.loadpath
 .externalToolBuilders/
 *.launch
 

@@ -1,6 +1,5 @@
 package com.left.addd.view;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.left.addd.AdddGame;
@@ -61,6 +59,7 @@ public class UIView implements Disposable {
 	private Label date;
 
 	private TextureRegionDrawable pauseBackground;
+	private TextureRegionDrawable timeBackground;
 	private Image[] timeIcons;
 
 	public UIView(AdddGame game, GameView gameView, TextureAtlas atlas, Skin skin) {
@@ -70,6 +69,7 @@ public class UIView implements Disposable {
 		this.skin = skin;
 		this.stage = new Stage(new ScreenViewport());
 		this.pauseBackground = new TextureRegionDrawable(atlas.findRegion(Res.PAUSE + "pausemenu"));
+		this.timeBackground = new TextureRegionDrawable(atlas.findRegion(Res.PAUSE + "timemenu"));
 
 		createUI();
 		setState(State.RUNNING, Speed.NORMAL);
@@ -263,7 +263,7 @@ public class UIView implements Disposable {
 	private Table getTimeTable() {
 		if(timeTable == null) {
 			timeTable = new Table();
-			timeTable.setBackground(pauseBackground);
+			timeTable.setBackground(timeBackground);
 			timeTable.setTouchable(Touchable.enabled);
 			timeTable.addListener(new EventListener() {
 				@Override
