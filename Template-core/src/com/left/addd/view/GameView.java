@@ -30,14 +30,14 @@ import com.left.addd.view.PannerAbstract;
 import com.left.addd.view.TileImageType;
 
 /**
- * Manages the drawing of the Grid to the screen and player controls.
+ * Manages the drawing of the model to the screen and player controls.
  * Reference: https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
 public class GameView implements InputProcessor {
 	public static final int TILE_LENGTH = 32;
 	
 	private final AdddGame game;
-	private final GameModel gridModel;
+	private final GameModel gameModel;
 	protected OrthographicCamera viewCamera;
 	
 	// Camera data
@@ -46,10 +46,10 @@ public class GameView implements InputProcessor {
 	// I/O data
 	private int buttonTouched;
 	private Vector3 touchPoint;
-	/** currentTileX and currentTileY are guaranteed to be within gridModel bounds */
+	/** currentTileX and currentTileY are guaranteed to be within gameModel bounds */
 	private int currentTileX;
 	private int currentTileY;
-	/** hoverX and hoverY are guaranteed to be within gridModel bounds when isHovering == true */
+	/** hoverX and hoverY are guaranteed to be within gameModel bounds when isHovering == true */
 	private boolean isHovering;
 	private int hoverX;
 	private int hoverY;
@@ -70,11 +70,11 @@ public class GameView implements InputProcessor {
 
 	public GameView(AdddGame game, GameModel model, TextureAtlas atlas) {
 		this.game = game;
-		this.gridModel = model;
+		this.gameModel = model;
 		this.viewCamera = new OrthographicCamera();
 		
 		Vector3 pannerMin = new Vector3((-3) * TILE_LENGTH, (-3) * TILE_LENGTH, 0);
-		Vector3 pannerMax = new Vector3((gridModel.width + 3) * TILE_LENGTH, (gridModel.height + 3)
+		Vector3 pannerMax = new Vector3((gameModel.width + 3) * TILE_LENGTH, (gameModel.height + 3)
 				* TILE_LENGTH, 0);
 		switch(Gdx.app.getType()) {
 		case Applet:
@@ -102,7 +102,7 @@ public class GameView implements InputProcessor {
 			}
 		}
 
-		this.tileImageTypes = new TileImageType[gridModel.width][gridModel.height];
+		this.tileImageTypes = new TileImageType[gameModel.width][gameModel.height];
 		updateAllTiles();
 	}
 	
@@ -118,7 +118,7 @@ public class GameView implements InputProcessor {
 	// ********************
 
 	public GameModel getModel() {
-		return gridModel;
+		return gameModel;
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class GameView implements InputProcessor {
 		panner.unproject(touchPoint);
 		int x = (int) touchPoint.x / TILE_LENGTH;
 		int y = (int) touchPoint.y / TILE_LENGTH;
-		if(0 <= x && x < gridModel.width && 0 <= y && y < gridModel.height) {
+		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
 			currentTileX = x;
 			currentTileY = y;
 			return true;
@@ -153,7 +153,7 @@ public class GameView implements InputProcessor {
 		panner.unproject(touchPoint);
 		int x = (int) touchPoint.x / TILE_LENGTH;
 		int y = (int) touchPoint.y / TILE_LENGTH;
-		if(0 <= x && x < gridModel.width && 0 <= y && y < gridModel.height) {
+		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
 			hoverX = x;
 			hoverY = y;
 			return true;
@@ -188,19 +188,19 @@ public class GameView implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-		// log("GridView", "KeyDown " + keycode);
+		log("GameView", "KeyDown " + keycode);
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		// log("GridView", "KeyUp " + keycode);
+		log("GameView", "KeyUp " + keycode);
 		return false;
 	}
 
 	@Override
 	public boolean keyTyped(char character) {
-		log("GridView", "KeyTyped " + character + " 0x" + Integer.toHexString(character));
+		log("GameView", "KeyTyped " + character + " 0x" + Integer.toHexString(character));
 		return false;
 	}
 
@@ -262,7 +262,7 @@ public class GameView implements InputProcessor {
 	// ********************
 
 	/**
-	 * Tells the GridModel to perform an action at the given Tile coordinate.
+	 * Tells the GameModel to perform an action at the given Tile coordinate.
 	 */
 	private void touchTile() {
 		game.getSound().play(SoundList.CLICK);
@@ -285,7 +285,7 @@ public class GameView implements InputProcessor {
 	 * @param tile Coordinate of Tile to update.
 	 */
 	private void updateTile(int x, int y) {
-		Tile tile = gridModel.getTile(x, y);
+		Tile tile = gameModel.getTile(x, y);
 		if(tile.hasNetwork()) {
 			// Update tile and NESW neighbours
 			setTileImageType(tile);
@@ -298,7 +298,7 @@ public class GameView implements InputProcessor {
 			Building b = tile.getBuilding();
 			for(int i = 0; i < b.getWidth(); i++) {
 				for(int j = 0; j < b.getHeight(); j++) {
-					setTileImageType(gridModel.getTile(b.getOriginX() + i, b.getOriginY() + j));
+					setTileImageType(gameModel.getTile(b.getOriginX() + i, b.getOriginY() + j));
 				}
 			}
 		} else {
@@ -315,9 +315,9 @@ public class GameView implements InputProcessor {
 	 * Update all the tile views.
 	 */
 	private void updateAllTiles() {
-		for(int i = 0; i < gridModel.width; i++) {
-			for(int j = 0; j < gridModel.height; j++) {
-				setTileImageType(gridModel.getTile(i, j));
+		for(int i = 0; i < gameModel.width; i++) {
+			for(int j = 0; j < gameModel.height; j++) {
+				setTileImageType(gameModel.getTile(i, j));
 			}
 		}
 	}
@@ -359,8 +359,8 @@ public class GameView implements InputProcessor {
 	}
 
 	private void renderTiles(SpriteBatch batch, float delta) {
-		for(int i = 0; i < gridModel.width; i++) {
-			for(int j = 0; j < gridModel.height; j++) {
+		for(int i = 0; i < gameModel.width; i++) {
+			for(int j = 0; j < gameModel.height; j++) {
 				Image image = tileImageCache.get(tileImageTypes[i][j]);
 				if(image != null) {
 					image.setPosition(i * GameView.TILE_LENGTH, j * GameView.TILE_LENGTH);
@@ -373,7 +373,7 @@ public class GameView implements InputProcessor {
 	private void renderHover(SpriteBatch batch, float delta) {
 		if(isHovering) {
 			Image image;
-			Tile tile = gridModel.getTile(hoverX, hoverY);
+			Tile tile = gameModel.getTile(hoverX, hoverY);
 			int x, y;
 
 			if(tile.hasBuilding()) {

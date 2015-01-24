@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.left.addd.utils.Utils;
 
 /**
- * Handles the camera logic for GridView.
+ * Handles the camera logic for GameView.
  * Includes the graphics that appear during scrolling.
  */
 public abstract class PannerAbstract implements Panner {
@@ -18,7 +18,6 @@ public abstract class PannerAbstract implements Panner {
 	protected final Vector3 MIN_BOUND;
 	protected final Vector3 MAX_BOUND;
 
-	// GridView's camera
 	protected OrthographicCamera viewCamera;
 	private BoundingBox bounds;
 

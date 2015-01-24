@@ -3,7 +3,7 @@ package com.left.addd.utils;
 import com.badlogic.gdx.Gdx;
 
 public class Log {
-	private static final String TAG_MAIN = "GridGame";
+	private static final String TAG_MAIN = "GGJ2015";
 
 	public static void l(String message) {
 		log(TAG_MAIN, message);

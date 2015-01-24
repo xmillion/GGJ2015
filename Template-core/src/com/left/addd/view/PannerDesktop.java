@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.left.addd.utils.Res;
 
 /**
- * Handles the camera logic for GridView on desktop computers and web browsers.
+ * Handles the camera logic for GameView on desktop computers and web browsers.
  */
 public class PannerDesktop extends PannerAbstract {
 

@@ -26,7 +26,7 @@ import com.left.addd.utils.DefaultButtonListener;
 import com.left.addd.utils.Res;
 
 /**
- * Manages the drawing and interaction of UI elements in the GridScreen.
+ * Manages the drawing and interaction of UI elements in the GameScreen.
  * Reference: https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
 public class UIView implements Disposable {
@@ -47,7 +47,7 @@ public class UIView implements Disposable {
 	protected static final float BUTTON_SPACING = 10f;
 
 	private final AdddGame game;
-	private final GameView gridView;
+	private final GameView gameView;
 	private final TextureAtlas atlas;
 	private final Skin skin;
 	private final Stage stage;
@@ -63,9 +63,9 @@ public class UIView implements Disposable {
 	private TextureRegionDrawable pauseBackground;
 	private Image[] timeIcons;
 
-	public UIView(AdddGame game, GameView gridView, TextureAtlas atlas, Skin skin) {
+	public UIView(AdddGame game, GameView gameView, TextureAtlas atlas, Skin skin) {
 		this.game = game;
-		this.gridView = gridView;
+		this.gameView = gameView;
 		this.atlas = atlas;
 		this.skin = skin;
 		this.stage = new Stage(new ScreenViewport());
@@ -181,7 +181,7 @@ public class UIView implements Disposable {
 					@Override
 					public void pressed(InputEvent event, float x, float y, int pointer, int button) {
 						game.getSound().play(SoundList.CLICK);
-						game.getSaver().save(gridView.getModel(), saveSlot);
+						game.getSaver().save(gameView.getModel(), saveSlot);
 						UIView.this.hideSaveMenu();
 						UIView.this.setState(State.RUNNING);
 					}
@@ -453,7 +453,7 @@ public class UIView implements Disposable {
 	 */
 	public void render(float delta) {
 		// Get game info
-		Time time = gridView.getModel().getTime();
+		Time time = gameView.getModel().getTime();
 		long hour = time.getHour();
 		long day = time.getDay();
 		date.setText("Day " + day + ", " + hour + ":00");

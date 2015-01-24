@@ -7,7 +7,7 @@ public class Res {
 	public static final String SOUND = "sound/";
 	public static final String UI = "ui/";
 	
-	// Grid Image Atlas
+	// Image Atlas
 	public static final String TILES = "tiles/";
 	// UI Image Atlas
 	public static final String BUILD = "ui/build/";

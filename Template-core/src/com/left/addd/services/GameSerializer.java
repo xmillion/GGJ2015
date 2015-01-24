@@ -22,8 +22,8 @@ public class GameSerializer {
 		json.setSerializer(GameModel.class, new Json.Serializer<GameModel>() {
 			@SuppressWarnings("rawtypes")
 			@Override
-			public void write(Json json, GameModel gridModel, Class knownType) {
-				gridModel.save(json);
+			public void write(Json json, GameModel gameModel, Class knownType) {
+				gameModel.save(json);
 			}
 
 			@SuppressWarnings("rawtypes")
@@ -47,7 +47,7 @@ public class GameSerializer {
 	}
 
 	/**
-	 * Serializes the gridModel into a json file.
+	 * Serializes the gameModel into a json file.
 	 * @param templateModel Model to save
 	 */
 	public void save(GameModel templateModel, int slot) {

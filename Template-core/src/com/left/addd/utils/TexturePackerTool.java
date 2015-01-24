@@ -4,7 +4,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 public class TexturePackerTool {
 	private static final String RAW_DIR = "res/";
-	private static final String ASSETS_DIR = "../Grid-android/assets/";
+	private static final String ASSETS_DIR = "../addd-android/assets/";
 	
 	public static void main(String[] args) {
 		String inputDir = RAW_DIR;

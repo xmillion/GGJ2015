@@ -11,32 +11,32 @@ import com.left.addd.utils.Utils;
 public class Tile {
 	private static Tile dummyTile;
 
-	protected final GameModel grid;
+	protected final GameModel gameModel;
 	public final int x;
 	public final int y;
 
 	private Building building;
 	private Network network;
 
-	public Tile(GameModel grid) {
-		this(grid, -1, -1, null, null);
+	public Tile(GameModel gameModel) {
+		this(gameModel, -1, -1, null, null);
 	}
 
-	public Tile(GameModel grid, int x, int y) {
-		this(grid, x, y, null, null);
+	public Tile(GameModel gameModel, int x, int y) {
+		this(gameModel, x, y, null, null);
 	}
 
 	/**
 	 * Create a Tile.
 	 * 
-	 * @param grid Governing grid
+	 * @param gameModel Governing model
 	 * @param x coordinate
 	 * @param y coordinate
 	 * @param building Building on this Tile
 	 * @param network Network on this Tile
 	 */
-	public Tile(GameModel grid, int x, int y, Building building, Network network) {
-		this.grid = grid;
+	public Tile(GameModel gameModel, int x, int y, Building building, Network network) {
+		this.gameModel = gameModel;
 		this.x = x;
 		this.y = y;
 
@@ -96,16 +96,16 @@ public class Tile {
 	public Tile getNeighbour(Direction dir) {
 		switch(dir) {
 		case NORTH:
-			return grid.getTile(x, y + 1);
+			return gameModel.getTile(x, y + 1);
 		case EAST:
-			return grid.getTile(x + 1, y);
+			return gameModel.getTile(x + 1, y);
 		case SOUTH:
-			return grid.getTile(x, y - 1);
+			return gameModel.getTile(x, y - 1);
 		case WEST:
-			return grid.getTile(x - 1, y);
+			return gameModel.getTile(x - 1, y);
 		default:
 			// unreachable code
-			return grid.getTile(x, y);
+			return gameModel.getTile(x, y);
 		}
 	}
 
@@ -174,7 +174,7 @@ public class Tile {
 	 */
 	@Override
 	public int hashCode() {
-		return x * grid.width + y;
+		return x * gameModel.width + y;
 	}
 
 	/**
