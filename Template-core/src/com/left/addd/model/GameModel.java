@@ -22,6 +22,8 @@ public class GameModel {
 	public final int width;
 	public final int height;
 	private Time time;
+	
+	private Entity testEntity;
 
 	public GameModel(int width, int height) {
 		this(width, height, 0, true);
@@ -40,10 +42,16 @@ public class GameModel {
 		}
 		
 		this.time = new Time(timeInHours);
+		
+		this.testEntity = new Entity("testguy", tiles[3][3], tiles[10][10]);
 	}
 	
 	public Time getTime() {
 		return time;
+	}
+	
+	public Entity getTestEntity() {
+		return testEntity;
 	}
 
 	public Tile[][] getTiles() {

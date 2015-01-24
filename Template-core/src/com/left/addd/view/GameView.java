@@ -30,19 +30,19 @@ import com.left.addd.view.PannerAbstract;
 import com.left.addd.view.TileImageType;
 
 /**
- * Manages the drawing of the model to the screen and player controls.
- * Reference: https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
+ * Manages the drawing of the model to the screen and player controls. Reference:
+ * https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
 public class GameView implements InputProcessor {
 	public static final int TILE_LENGTH = 32;
-	
+
 	private final AdddGame game;
 	private final GameModel gameModel;
 	protected OrthographicCamera viewCamera;
-	
+
 	// Camera data
 	private Panner panner;
-	
+
 	// I/O data
 	private int buttonTouched;
 	private Vector3 touchPoint;
@@ -59,8 +59,11 @@ public class GameView implements InputProcessor {
 	private static final Color buildColor = new Color(0.8f, 1, 0.8f, 0.8f);
 	private static final Color blockColor = new Color(1, 0.7f, 0.7f, 0.6f);
 	private static final Color blankColor = new Color(1, 1, 1, 1);
-	
+
 	// Tile rendering data
+	private EntitySprite testEntity;
+	
+	// Assets
 	private final Map<TileImageType, Image> tileImageCache;
 	private final TileImageType[][] tileImageTypes;
 
@@ -72,7 +75,7 @@ public class GameView implements InputProcessor {
 		this.game = game;
 		this.gameModel = model;
 		this.viewCamera = new OrthographicCamera();
-		
+
 		Vector3 pannerMin = new Vector3((-3) * TILE_LENGTH, (-3) * TILE_LENGTH, 0);
 		Vector3 pannerMax = new Vector3((gameModel.width + 3) * TILE_LENGTH, (gameModel.height + 3)
 				* TILE_LENGTH, 0);
@@ -88,10 +91,13 @@ public class GameView implements InputProcessor {
 			this.panner = new PannerMobile(atlas, pannerMin, pannerMax);
 			break;
 		}
-		
+
 		buttonTouched = Buttons.LEFT;
 		touchPoint = new Vector3();
 		isHovering = false;
+		
+		testEntity = new EntitySprite(atlas, gameModel.getTestEntity());
+		
 		// Load all the tile images into cache
 		this.tileImageCache = new EnumMap<TileImageType, Image>(TileImageType.class);
 		for(TileImageType type: TileImageType.values()) {
@@ -104,6 +110,7 @@ public class GameView implements InputProcessor {
 
 		this.tileImageTypes = new TileImageType[gameModel.width][gameModel.height];
 		updateAllTiles();
+		create();
 	}
 
 	// ********************
@@ -159,8 +166,7 @@ public class GameView implements InputProcessor {
 	// ********************
 
 	/**
-	 * Checks for arrow keys being pressed, and pans accordingly.
-	 * TODO Merge this into PannerDesktop?
+	 * Checks for arrow keys being pressed, and pans accordingly. TODO Merge this into PannerDesktop?
 	 */
 	private void panKeyboard() {
 		if(Gdx.input.isKeyPressed(Keys.UP)) {
@@ -204,7 +210,11 @@ public class GameView implements InputProcessor {
 			// Panning
 			return true;
 		}
-		// Interact with tile on touchUp
+		// TODO click hit detection. Do this on touchDown or touchUp?
+		// 1. Find the intent of the user... selecting a character or a tile?
+		// 2. Find the target (character, or the tile underneath)
+		// 3. Call the appropriate view classes to handle the selection
+
 		return false;
 	}
 
@@ -214,7 +224,7 @@ public class GameView implements InputProcessor {
 			// Panning
 			return true;
 		}
-		
+
 		if(button == Buttons.RIGHT) {
 			// Deselect
 			return true;
@@ -272,8 +282,7 @@ public class GameView implements InputProcessor {
 	}
 
 	/**
-	 * Call this to update the Tile View for the given Tile coordinate.
-	 * Note: only tile.x and tile.y are used.
+	 * Call this to update the Tile View for the given Tile coordinate. Note: only tile.x and tile.y are used.
 	 * 
 	 * @param tile Coordinate of Tile to update.
 	 */
@@ -295,12 +304,7 @@ public class GameView implements InputProcessor {
 				}
 			}
 		} else {
-			// There is a problem here with erase:
-			// Since the model has already removed all traces of the building/network,
-			// I won't know which tiles have been modified.
-
-			// Workaround is to update all tiles
-			updateAllTiles();
+			setTileImageType(tile);
 		}
 	}
 
@@ -332,6 +336,10 @@ public class GameView implements InputProcessor {
 	// **** Rendering *****
 	// ********************
 	
+	public void create() {
+		testEntity.create();
+	}
+
 	public void render(SpriteBatch batch, float delta) {
 		// Pan camera
 		panKeyboard();
@@ -340,6 +348,7 @@ public class GameView implements InputProcessor {
 		batch.begin();
 		renderTiles(batch, delta);
 		renderHover(batch, delta);
+		renderEntities(batch, delta);
 		batch.end();
 
 		panner.render(delta);
@@ -373,6 +382,7 @@ public class GameView implements InputProcessor {
 				x = tile.x;
 				y = tile.y;
 			}
+
 			image = tileImageCache.get(tileImageTypes[x][y]);
 			if(image != null) {
 				image.setPosition(x * GameView.TILE_LENGTH, y * GameView.TILE_LENGTH);
@@ -382,10 +392,14 @@ public class GameView implements InputProcessor {
 			}
 		}
 	}
+	
+	private void renderEntities(SpriteBatch batch, float delta) {
+		testEntity.getImageForRender(delta).draw(batch, 1f);
+	}
 
 	public void resize(int width, int height) {
 		panner.resize(width, height);
-		
+
 		// width & height are already scaled.
 		viewCamera.viewportWidth = width;
 		viewCamera.viewportHeight = height;

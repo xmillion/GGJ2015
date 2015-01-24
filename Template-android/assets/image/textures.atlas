@@ -4,7 +4,7 @@ size: 64,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-characters/character
+entities/main
   rotate: false
   xy: 2, 2
   size: 32, 32
