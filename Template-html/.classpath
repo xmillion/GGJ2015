@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<classpath>
+    <classpathentry kind="src" path="src"/>
+    <classpathentry combineaccessrules="false" kind="src" path="/Template-core"/>
+    <classpathentry kind="output" path="war/WEB-INF/classes"/>
+    <classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+    <classpathentry kind="lib" path="war/WEB-INF/lib/gdx-backend-gwt.jar"/>
+    <classpathentry kind="lib" path="/Template-core/lib/gdx.jar"/>
+</classpath>
