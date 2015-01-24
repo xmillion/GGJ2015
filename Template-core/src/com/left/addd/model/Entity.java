@@ -3,6 +3,9 @@ package com.left.addd.model;
 import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Entity {
 
 	private String name;
@@ -14,9 +17,8 @@ public class Entity {
 	private int moveDuration;
 	private int moveProgress;
 	
-	// this is willis's 4:30am event handling implementation
-	private boolean moveStarted = false;
-	private boolean moveCompleted = false;
+	// this is willis's 11am event handling implementation
+	private List<StateChangedListener> listeners;
 	
 	public Entity(String name, Tile currentTile, Tile objectiveTile) {
 		this.name = name;
@@ -24,8 +26,9 @@ public class Entity {
 		this.nextTile = currentTile;
 		this.objectiveTile = objectiveTile;
 		
-		this.moveDuration = 6;
+		this.moveDuration = 3;
 		this.moveProgress = 0;
+		this.listeners = new ArrayList<StateChangedListener>(1);
 	}
 	
 	public String getName() {
@@ -42,6 +45,7 @@ public class Entity {
 	
 	public void setCurrentTile(Tile t) {
 		this.currentTile = t;
+		stateChanged();
 	}
 	
 	public Tile getNextTile() {
@@ -51,6 +55,7 @@ public class Entity {
 	public void setNextTile(Tile t) {
 		// make this private, it should be determined by a pathfinder
 		this.nextTile = t;
+		stateChanged();
 	}
 	
 	public Tile getObjectiveTile() {
@@ -73,50 +78,48 @@ public class Entity {
 		return moveProgress;
 	}
 	
-	public boolean triggerMoveStarted() {
-		if (moveStarted) {
-			moveStarted = false;
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean triggerMoveCompleted() {
-		if (moveCompleted) {
-			moveCompleted = false;
-			return true;
-		}
-		return false;
+	public void addStateChangedListener(StateChangedListener listener) {
+		this.listeners.add(listener);
+		listener.OnStateChanged();
 	}
 	
 	public boolean move(Direction dir) {
 		Tile next = currentTile.getNeighbour(dir);
 		if (!Tile.isDummyTile(next)) {
 			nextTile = next;
-			moveStarted = true;
 			moveProgress = 0;
+			stateChanged();
+			return true;
 		}
-		
-		return moveStarted;
+		return false;
 	}
 	
 	// go back to old tile
 	public void stop() {
 		nextTile = currentTile;
-		moveCompleted = true;
 		moveProgress = 0;
+		stateChanged();
+	}
+	
+	private void finishedMoving() {
+		currentTile = nextTile;
+		moveProgress = 0;
+		stateChanged();
 	}
 
 	public void update(int ticks) {
 		moveProgress += ticks;
 		if (moveProgress >= moveDuration) {
-			// finished moving
-			currentTile = nextTile;
-			moveCompleted = true;
-			moveProgress = 0;
+			finishedMoving();
 			
 			// TODO determine nextTile based on a pathfinder
 			move(Direction.EAST);
+		}
+	}
+	
+	private void stateChanged() {
+		for(StateChangedListener l : listeners) {
+			l.OnStateChanged();
 		}
 	}
 }

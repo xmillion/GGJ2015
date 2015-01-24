@@ -9,11 +9,12 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.left.addd.model.Entity;
+import com.left.addd.model.StateChangedListener;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
 import com.left.addd.utils.Res;
 
-public class EntitySprite implements TileRenderable {
+public class EntitySprite implements TileRenderable, StateChangedListener {
 
 	private final TextureAtlas atlas;
 	private final Entity entity;
@@ -26,8 +27,8 @@ public class EntitySprite implements TileRenderable {
 	private int startY;
 	private float currentX;
 	private float currentY;
-	private float endX;
-	private float endY;
+	private int endX;
+	private int endY;
 	private boolean isMoving;
 	
 	// private TextureRegion[] playerFrames;
@@ -38,6 +39,7 @@ public class EntitySprite implements TileRenderable {
 	public EntitySprite(TextureAtlas atlas, Entity entity) {
 		this.atlas = atlas;
 		this.entity = entity;
+		entity.addStateChangedListener(this);
 	}
 
 	@Override
@@ -49,19 +51,12 @@ public class EntitySprite implements TileRenderable {
 
 	@Override
 	public Image getImageForRender(float delta) {
-		if (entity.triggerMoveCompleted()) {
-			OnMoveCompleted();
-		}
-		if (entity.triggerMoveStarted()) {
-			OnMoveStarted();
-		}
-		
-		
 		if (isMoving) {
 			time += delta;
 			final float progress = time / Time.getRealTimeFromTicks(entity.getMoveDuration());
 			if (progress > 1f) {
-				OnMoveCompleted();
+				// something's wrong
+				log("progress=" + progress);
 			}
 			currentX = Interpolation.linear.apply(startX, endX, progress);
 			currentY = Interpolation.linear.apply(startY, endY, progress);
@@ -69,33 +64,6 @@ public class EntitySprite implements TileRenderable {
 		
 		currentImage.setPosition(currentX * Res.ENTITY_LENGTH, currentY * Res.ENTITY_LENGTH);
 		return currentImage;
-	}
-	
-	private void OnMoveStarted() {
-		log("move started");
-		time = 0;
-		Tile current = entity.getCurrentTile();
-		Tile next = entity.getNextTile();
-		startX = current.x;
-		startY = current.y;
-		currentX = current.x;
-		currentY = current.y;
-		endX = next.x;
-		endY = next.y;
-		isMoving = true;
-	}
-	
-	private void OnMoveCompleted() {
-		log("Move completed");
-		time = 0;
-		Tile current = entity.getCurrentTile();
-		startX = current.x;
-		startY = current.y;
-		currentX = current.x;
-		currentY = current.y;
-		endX = current.x;
-		endY = current.y;
-		isMoving = false;
 	}
 
 	@Override
@@ -116,5 +84,34 @@ public class EntitySprite implements TileRenderable {
 	@Override
 	public float getHeight() {
 		return currentFrame.getRegionHeight();
+	}
+
+	@Override
+	public void OnStateChanged() {
+		Tile current = entity.getCurrentTile();
+		Tile next = entity.getNextTile();
+		if (current.equals(next)) {
+			// entity is no longer moving
+			log("no longer moving" + pCoords(current));
+			time = 0;
+			startX = current.x;
+			startY = current.y;
+			currentX = current.x;
+			currentY = current.y;
+			endX = current.x;
+			endY = current.y;
+			isMoving = false;
+		} else {
+			// entity is now moving
+			log("now moving" + pCoords(current));
+			time = 0;
+			startX = current.x;
+			startY = current.y;
+			currentX = current.x;
+			currentY = current.y;
+			endX = next.x;
+			endY = next.y;
+			isMoving = true;
+		}
 	}
 }
