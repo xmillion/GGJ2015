@@ -96,7 +96,7 @@ public class GameSerializer {
 	 */
 	protected static void testme() {
 		GameSerializer serializer = new GameSerializer();
-		GameModel model = new GameModel();
+		GameModel model = new GameModel(0, 0);
 
 		String saveData = serializer.json.prettyPrint(model);
 		System.out.println(saveData);
