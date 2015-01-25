@@ -5,6 +5,7 @@ import static com.left.addd.utils.Log.pCoords;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.StringBuilder;
@@ -12,6 +13,7 @@ import com.left.addd.model.GameModel;
 import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
+import com.left.addd.services.EntityManager;
 
 /**
  * TemplateModel is the model for this game. It represents the logic behind this game.
@@ -23,11 +25,10 @@ public class GameModel {
 	public final int width;
 	public final int height;
 	private Time time;
-	private ArrayList<Entity> entity_list;
-	
-	private List<Entity> entities;
 	
 	private List<StateChangedListener> listeners;
+	
+	EntityManager em = EntityManager.getInstance();
 
 	public GameModel(int width, int height) {
 		this(width, height, 0, true);
@@ -37,7 +38,6 @@ public class GameModel {
 		this.width = width;
 		this.height = height;
 		this.tiles = new Tile[width][height];
-		this.entity_list = new ArrayList<Entity>();
 		if(initializeTiles) {
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
@@ -48,15 +48,14 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		this.entities = new ArrayList<Entity>();
 		Entity testEntity = new Entity(tiles[2][1]);
 		Entity testEntity2 = new Entity(tiles[5][4]);
 		testEntity.addMetadata("Name", "Bob");
 		testEntity.addMetadata("Description", "Bob is the first test entity");
 		testEntity2.addMetadata("Name", "Alice");
 		testEntity2.addMetadata("Description", "Alice is the second test entity");
-		entities.add(testEntity);
-		entities.add(testEntity2);
+		em.addEntity(testEntity);
+		em.addEntity(testEntity2);
 		testEntity.move(Direction.NORTH);
 		testEntity.setTargetEntity(testEntity2);
 		
@@ -72,7 +71,7 @@ public class GameModel {
 	}
 	
 	public List<Entity> getEntities() {
-		return entities;
+		return em.getEntities();
 	}
 
 	public Tile[][] getTiles() {
@@ -130,6 +129,7 @@ public class GameModel {
 		int ticks = time.update(delta);
 		updateTiles(ticks);
 		updateEntities(ticks);
+		em.checkObjectivesAndUpdateTargets();
 	}
 
 	private void updateTiles(int ticks) {
@@ -141,7 +141,7 @@ public class GameModel {
 	}
 	
 	private void updateEntities(int ticks) {
-		for(Entity e : entities) {
+		for(Entity e : em.getEntities()) {
 			e.update(ticks);
 		}
 	}
@@ -181,7 +181,7 @@ public class GameModel {
 		for(int i = 0; i < entityData.size; i++) {
 			entityValue = entityData.get(i);
 			Entity entity = Entity.load(json, entityValue, gameModel);
-			gameModel.entity_list.add(entity);
+			gameModel.em.addEntity(entity);
 		}
 		
 

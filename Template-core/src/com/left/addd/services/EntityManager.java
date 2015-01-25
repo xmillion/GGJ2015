@@ -21,15 +21,19 @@ public class EntityManager {
 		return manager;
 	}
 	
-	public static void addEntity(Entity em) {
+	public void addEntity(Entity em) {
 		entityPool.add(em);
 	}
 	
-	public static void freeEntity(Entity em) {
+	public void freeEntity(Entity em) {
 		entityPool.remove(em);
 	}
 	
-	public static void checkObjectivesAndUpdateTargets() {
+	public ArrayList<Entity> getEntities() {
+		return entityPool;
+	}
+	
+	public void checkObjectivesAndUpdateTargets() {
 		for (Entity em : entityPool) {
 			Set<Entity> objectives = em.getObjectives().keySet();
 			for(Entity o : objectives) {
@@ -41,7 +45,7 @@ public class EntityManager {
 		}
 	}
 	
-	private static boolean checkAdjacency(Entity e1, Entity e2) {
+	private boolean checkAdjacency(Entity e1, Entity e2) {
 		int e1_x = e1.getCurrentTile().x;
 		int e1_y = e1.getCurrentTile().y;
 		

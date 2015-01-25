@@ -467,12 +467,11 @@ public class GameView implements InputProcessor, StateChangedListener {
 
 	private void renderTooltip(SpriteBatch batch) {
 		BitmapFont font = new BitmapFont();
-		font.setColor(Color.GREEN);
+		font.setColor(Color.DARK_GRAY);
 		float tooltipOffset = 10;
-		float lineHeight = 32;
+		float lineHeight = 16;
 		Entity te = null;
 		for (EntitySprite es: entitySprites) {
-			//System.out.println("es "+es.getX()*TILE_LENGTH+","+es.getY()*TILE_LENGTH+" "+es.getWidth()+"x"+es.getHeight());
 			if((es.getX()*TILE_LENGTH < tooltip.x && (es.getX()*TILE_LENGTH + es.getWidth()) > tooltip.x) &&
 			   (es.getY()*TILE_LENGTH < tooltip.y && (es.getY()*TILE_LENGTH + es.getHeight()) > tooltip.y)) {
 				te = es.getEntity();
@@ -486,6 +485,11 @@ public class GameView implements InputProcessor, StateChangedListener {
 				String metadata = s + ": "+te.getMetadata().get(s).toString();
 				font.draw(batch, metadata , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
 				lineCount++;
+			}
+			if(te.getTargetEntity() != null)
+				font.draw(batch, "Target: "+te.getTargetEntity().getCurrentTile().toString() , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
+			else {
+				font.draw(batch, "afk" , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
 			}
 		}
 	}
