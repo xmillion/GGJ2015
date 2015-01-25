@@ -49,9 +49,9 @@ public class GameModel {
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
-					{1,1,1,1,1,0,0,0,0,0,0,0,1,0,0},
+					{1,1,1,1,1,0,0,1,0,0,0,0,1,0,0},
 					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
-					{1,0,0,0,1,0,0,0,0,0,0,1,1,0,0},
+					{1,0,0,1,1,0,0,0,0,0,0,1,1,0,0},
 					{1,0,0,0,1,1,1,1,1,1,1,1,1,0,0},
 					{0,0,0,0,1,0,0,0,1,0,0,0,0,0,1},
 					{1,1,1,1,1,0,0,0,1,1,1,1,1,1,1},
@@ -84,6 +84,7 @@ public class GameModel {
 		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[2][2]);
 		testEntity2.addMetadata("Name", "Bob");
 		testEntity2.addMetadata("Description", "Bob is a hardworking family man");
+		testEntity.setTargetEntity(testEntity2);
 
 		NPC testEntity3 = new NPC(NPCType.FACULTY, tiles[13][14]);
 		testEntity3.addMetadata("Name", "Chad");
@@ -100,6 +101,14 @@ public class GameModel {
 		NPC testEntity6 = new NPC(NPCType.POLICE, tiles[9][7]);
 		testEntity6.addMetadata("Name", "POPO");
 		testEntity6.addMetadata("Description", "Reminds Bob to be an upstanding, working citizen");
+		
+		NPC testEntity7 = new NPC(NPCType.FACULTY, tiles[11][3]);
+		testEntity7.addMetadata("Name", "Some Random Dude");
+		testEntity7.addMetadata("Description", "He looks a stoned");
+		
+		NPC testEntity8 = new NPC(NPCType.FACULTY, tiles[11][4]);
+		testEntity8.addMetadata("Name", "Runner");
+		testEntity8.addMetadata("Description", "He likes shorts. They're comfortable and easy to wear");
 
 		testEntity.addObjective(testEntity2, testEntity3);
 		testEntity.addObjective(testEntity3, testBuilding);
@@ -108,17 +117,22 @@ public class GameModel {
 		testEntity2.addObjective(testEntity5,  testEntity4);
 		testEntity2.addObjective(testEntity6, testBuilding2);
 		testEntity3.addObjective(testEntity,  testBuilding);
-		
+		testEntity8.setTargetEntity(testEntity7);
+		testEntity8.addObjective(testEntity6, testEntity5);
+		testEntity8.addObjective(testEntity5, testEntity7);
+		testEntity8.addObjective(testEntity7, testEntity6);
+
+		em.addEntity(testBuilding);
+		em.addEntity(testBuilding2);
 		em.addEntity(testEntity);
 		em.addEntity(testEntity2);
 		em.addEntity(testEntity3);
 		em.addEntity(testEntity4);
 		em.addEntity(testEntity5);
 		em.addEntity(testEntity6);
-		em.addEntity(testBuilding);
-		em.addEntity(testBuilding2);
+		em.addEntity(testEntity7);
+		em.addEntity(testEntity8);
 		testEntity.move(Direction.NORTH);
-		testEntity.setTargetEntity(testEntity2);
 		
 		this.listeners = new ArrayList<StateChangedListener>();
 	}
