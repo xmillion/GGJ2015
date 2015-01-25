@@ -472,7 +472,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 		float lineHeight = 32;
 		Entity te = null;
 		for (EntitySprite es: entitySprites) {
-			System.out.println("es "+es.getX()*TILE_LENGTH+","+es.getY()*TILE_LENGTH+" "+es.getWidth()+"x"+es.getHeight());
+			//System.out.println("es "+es.getX()*TILE_LENGTH+","+es.getY()*TILE_LENGTH+" "+es.getWidth()+"x"+es.getHeight());
 			if((es.getX()*TILE_LENGTH < tooltip.x && (es.getX()*TILE_LENGTH + es.getWidth()) > tooltip.x) &&
 			   (es.getY()*TILE_LENGTH < tooltip.y && (es.getY()*TILE_LENGTH + es.getHeight()) > tooltip.y)) {
 				te = es.getEntity();

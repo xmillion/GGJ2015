@@ -41,7 +41,7 @@ public class GameModel {
 		if(initializeTiles) {
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
-					tiles[i][j] = new Tile(this, i, j);
+					tiles[i][j] = new Tile(this, i, j, new Network(NetworkType.ROAD, null, null, this.getTile(i, j-1).getNetwork(), this.getTile(i-1, j).getNetwork()));
 				}
 			}
 		}
@@ -49,8 +49,8 @@ public class GameModel {
 		this.time = new Time(timeInHours);
 		
 		this.entities = new ArrayList<Entity>();
-		Entity testEntity = new Entity(tiles[0][1]);
-		Entity testEntity2 = new Entity(tiles[0][2]);
+		Entity testEntity = new Entity(tiles[2][1]);
+		Entity testEntity2 = new Entity(tiles[5][4]);
 		testEntity.addMetadata("Name", "Bob");
 		testEntity.addMetadata("Description", "Bob is the first test entity");
 		testEntity2.addMetadata("Name", "Alice");
@@ -58,7 +58,7 @@ public class GameModel {
 		entities.add(testEntity);
 		entities.add(testEntity2);
 		testEntity.move(Direction.NORTH);
-		testEntity.move(Direction.EAST);
+		testEntity.setTargetEntity(testEntity2);
 		
 		this.listeners = new ArrayList<StateChangedListener>();
 	}

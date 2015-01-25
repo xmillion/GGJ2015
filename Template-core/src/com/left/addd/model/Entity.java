@@ -112,6 +112,7 @@ public class Entity {
 	private void finishedMoving() {
 		currentTile = nextTile;
 		moveProgress = 0;
+		findPathToTarget();
 		stateChanged();
 	}
 
@@ -167,10 +168,13 @@ public class Entity {
 	}
 	
 	private void findPathToTarget() {
+		if (mTargetEntity == null){
+			return;
+		}
 		int stepsTaken = 0;
 		Boolean success = false;
 		Tile targetTile = mTargetEntity.currentTile;
-		Node currNode = new Node(currentTile, targetTile, 0,null);
+		Node currNode = new Node(currentTile, currentTile, 0, null);
 		PriorityQueue<Node> searchList = new PriorityQueue<Node>();
 		HashMap<Tile, Node> visitedNodes = new HashMap<Tile, Node>();
 		searchList.add(new Node(currentTile, targetTile, stepsTaken, null));
@@ -185,13 +189,16 @@ public class Entity {
 				if(visitedNodes.get(tile) != null){
 					visitedNodes.get(tile).updateNode(newStepsTaken, currNode);
 				} else {
-					searchList.add(new Node(currNode.tile, targetTile, newStepsTaken, currNode));
+					searchList.add(new Node(tile, targetTile, newStepsTaken, currNode));
 				}
 			}
-			
+			visitedNodes.put(currNode.tile, currNode);
 		}
 		if (success) {
-			while (currNode.previous != null) {
+			if (currNode.tile == this.currentTile) {
+				return;
+			}
+			while (currNode.previous.tile != this.currentTile) {
 				currNode = currNode.previous;
 			}
 			this.nextTile = currNode.tile;
