@@ -277,19 +277,8 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 		if(button == Buttons.LEFT) {
 			// set the tile coordinates
 			if(setClickTileFromScreen(screenX, screenY)) {
-				// check if there is an entity on top
-				boolean targetFound = false;
-				Entity entity = entityView.selectEntityInTarget(clickCoordinate.x, clickCoordinate.y);
-				if (entity != null) {
-					log("Target found " + pCoords(entity.getCurrentTile()));
-					tooltipEntity = entity;
-					targetFound = true;
-				}
-				
 				// Interact with tile
-				if (!targetFound) {
-					touchTile();
-				}
+				touchTile();
 			}
 		} else if(button == Buttons.RIGHT) {
 			// set the tile coordinates
@@ -317,7 +306,16 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 	public boolean mouseMoved(int screenX, int screenY) {
 		isHovering = setHoverTileFromScreen(screenX, screenY);
 		if(isHovering) {
-			hoverTile();
+			boolean targetFound = false;
+			tooltipEntity = entityView.selectEntityInTarget(hoverCoordinate.x, hoverCoordinate.y);
+			if (tooltipEntity != null) {
+				log("Target found " + pCoords(tooltipEntity.getCurrentTile()));
+				targetFound = true;
+			}
+			
+			if (!targetFound) {
+				hoverTile();
+			}
 		}
 
 		tooltip.set(screenX, screenY, 0);

@@ -48,7 +48,7 @@ public class GameScreen extends AbstractScreen {
 	public void render(float delta) {
 		SpriteBatch batch = getBatch();
 		// Draw the views
-		Gdx.gl.glClearColor(0.2f, 0f, 0.4f, 1f);
+		Gdx.gl.glClearColor(0.2f, 0.6f, 0.8f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		if(uiView.getState() == UIView.State.RUNNING) {

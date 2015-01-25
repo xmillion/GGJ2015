@@ -10,7 +10,7 @@ import com.left.addd.utils.Res;
  */
 public enum TileImageType {
 	NONE(""),
-	BLANK("tile"),
+	BLANK("grass"),
 	ROCK("rock"),
 	SAND("sand"),
 	GRASS("grass"),
