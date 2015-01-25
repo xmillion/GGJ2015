@@ -69,11 +69,11 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		Building testBuilding = new Building(BuildingType.HOUSE, tiles[13][0]);
+		Building testBuilding = new Building(BuildingType.HOUSE, tiles[12][0]);
 		testBuilding.addMetadata("Name", "Hotel");
 		testBuilding.addMetadata("Description", "This is where Alice and Chad go when they get it on");
 		
-		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[1][12]);
+		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[1][13]);
 		testBuilding2.addMetadata("Name", "Bob's Workplace");
 		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
 		
