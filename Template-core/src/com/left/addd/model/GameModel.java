@@ -50,12 +50,22 @@ public class GameModel {
 		
 		Entity testEntity = new Entity(tiles[2][1]);
 		Entity testEntity2 = new Entity(tiles[5][4]);
-		testEntity.addMetadata("Name", "Bob");
-		testEntity.addMetadata("Description", "Bob is the first test entity");
-		testEntity2.addMetadata("Name", "Alice");
-		testEntity2.addMetadata("Description", "Alice is the second test entity");
+		Entity testEntity3 = new Entity(tiles[10][10]);
+		testEntity.addMetadata("Name", "Alice");
+		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
+		
+		testEntity.addObjective(testEntity2, testEntity3);
+		testEntity.addObjective(testEntity3, testEntity2);
+		
+		testEntity2.addMetadata("Name", "Bob");
+		testEntity2.addMetadata("Description", "Bob is a hardworking family man");
+		
+		testEntity3.addMetadata("Name", "Chad");
+		testEntity3.addMetadata("Description", "Fucking Chad");
+		
 		em.addEntity(testEntity);
 		em.addEntity(testEntity2);
+		em.addEntity(testEntity3);
 		testEntity.move(Direction.NORTH);
 		testEntity.setTargetEntity(testEntity2);
 		

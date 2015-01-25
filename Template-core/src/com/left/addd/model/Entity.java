@@ -267,6 +267,10 @@ public class Entity {
 		return mObjectives;
 	}
 	
+	public void addObjective(Entity e1, Entity e2) {
+		mObjectives.put(e1, e2);
+	}
+	
 	public void addMetadata(String key, Object value) {
 		mMetadata.put(key, value);
 	}

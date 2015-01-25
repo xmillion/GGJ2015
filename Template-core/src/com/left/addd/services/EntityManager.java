@@ -38,7 +38,7 @@ public class EntityManager {
 			Set<Entity> objectives = em.getObjectives().keySet();
 			for(Entity o : objectives) {
 				if (checkAdjacency(em,o)) {
-					em.setTargetEntity(o);
+					em.setTargetEntity(em.getObjectives().get(o));
 					break;
 				}
 			}
