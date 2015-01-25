@@ -56,8 +56,11 @@ public class GameModel {
 		
 		this.entities = new ArrayList<Entity>();
 		Entity testEntity = new Entity("testentity", tiles[0][1], tiles[2][12]);
+		Entity testEntity2 = new Entity("testentity2", tiles[0][2], tiles[2][12]);
 		entities.add(testEntity);
+		entities.add(testEntity2);
 		testEntity.move(Direction.NORTH);
+		testEntity.move(Direction.EAST);
 		
 		this.listeners = new ArrayList<StateChangedListener>();
 	}

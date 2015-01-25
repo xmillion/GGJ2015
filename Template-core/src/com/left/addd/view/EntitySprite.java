@@ -57,10 +57,9 @@ public class EntitySprite implements TileRenderable, StateChangedListener {
 	public Image getImageForRender(float delta) {
 		if (isMoving) {
 			time += delta;
-			final float progress = time / Time.getRealTimeFromTicks(entity.getMoveDuration());
-			if (progress > 1f) {
-				// something's wrong
-				log("progress=" + progress);
+			float progress = time / Time.getRealTimeFromTicks(entity.getMoveDuration());
+			if (progress > 1) {
+				progress = 1;
 			}
 			currentX = Interpolation.linear.apply(startX, endX, progress);
 			currentY = Interpolation.linear.apply(startY, endY, progress);
