@@ -12,10 +12,8 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class Entity {
 
-
-	private Tile currentTile;
+	protected Tile currentTile;
 	private Tile nextTile;
-
 
 	/** Number of ticks to move to an adjacent tile */
 	private int moveDuration;
@@ -137,13 +135,12 @@ public class Entity {
 	 * @param tile Tile to save
 	 */
 	public void save(Json json) {
-		/*
 		json.writeObjectStart("entity");
-		json.writeValue("ox", this.originX);
-		json.writeValue("oy", this.originY);
-		json.writeValue("type", this.type.name());
+		json.writeValue("x", currentTile.x);
+		json.writeValue("y", currentTile.y);
+		json.writeValue("entity_type", "entity");
+		// TODO save metadata
 		json.writeObjectEnd();
-		*/
 	}
 
 	/**
@@ -154,11 +151,14 @@ public class Entity {
 	 */
 	public static Entity load(Json json, JsonValue jsonData, GameModel gameModel) {
 		EntityType type = EntityType.valueOf(jsonData.getString("entity_type"));
+		// TODO load metadata
 		if (type==EntityType.BUILDING){
 			Entity building = Building.load(json, jsonData, gameModel);
 			return building;
 		} else {
-			return null;
+			int x = jsonData.getInt("x");
+			int y = jsonData.getInt("y");
+			return new Entity(gameModel.getTile(x, y));
 		}
 	}
 	

@@ -5,28 +5,11 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class Building extends Entity{
 
-	private int originX;
-	private int originY;
-
 	public final BuildingType type;
 
-	public Building(String name, BuildingType type, Tile currentTile) {
-		super(name, currentTile);
-		setOrigin(currentTile.x, currentTile.y);
+	public Building(BuildingType type, Tile currentTile) {
+		super(currentTile);
 		this.type = type;
-	}
-
-	public int getOriginX() {
-		return originX;
-	}
-
-	public int getOriginY() {
-		return originY;
-	}
-
-	public void setOrigin(int x, int y) {
-		this.originX = x;
-		this.originY = y;
 	}
 
 	public int getWidth() {
@@ -50,11 +33,13 @@ public class Building extends Entity{
 	 * @param json Json serializer, which will now have the tile's data.
 	 * @param tile Tile to save
 	 */
+	@Override
 	public void save(Json json) {
-		json.writeObjectStart("entity");
-		json.writeValue("ox", this.originX);
-		json.writeValue("oy", this.originY);
-		json.writeValue("type", this.type.name());
+		json.writeObjectStart("building");
+		json.writeValue("x", this.currentTile.x);
+		json.writeValue("y", this.currentTile.y);
+		json.writeValue("entity_type", "building");
+		json.writeValue("building_type", this.type.name());
 		json.writeObjectEnd();
 	}
 
@@ -65,10 +50,9 @@ public class Building extends Entity{
 	 * @return
 	 */
 	public static Building load(Json json, JsonValue jsonData, GameModel gameModel) {
-		int ox = jsonData.getInt("ox");
-		int oy = jsonData.getInt("oy");
-		String name = jsonData.getString("name");
+		int x = jsonData.getInt("x");
+		int y = jsonData.getInt("y");
 		BuildingType type = BuildingType.valueOf(jsonData.getString("building_type"));
-		return new Building(name, type, gameModel.getTile(ox, oy));
+		return new Building(type, gameModel.getTile(x, y));
 	}
 }
