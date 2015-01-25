@@ -42,16 +42,16 @@ public class GameModel {
 			int[][] testMap = new int[][]{
 					{0,0,1,1,0,0,0,0,0,0,0,0,0,0,0},
 					{0,0,0,1,0,0,0,0,0,1,1,1,1,1,1},
-					{0,0,1,1,1,1,0,0,0,1,0,0,0,0,0},
-					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,1,1,1,1,0,1,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,1,1,1,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
-					{1,1,1,1,1,0,0,0,0,0,0,0,1,0,0},
+					{1,1,1,1,1,0,0,1,0,0,0,0,1,0,0},
 					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
-					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
+					{1,0,0,1,1,0,0,0,0,0,0,1,1,0,0},
 					{1,0,0,0,1,1,1,1,1,1,1,1,1,0,0},
 					{0,0,0,0,1,0,0,0,1,0,0,0,0,0,1},
 					{1,1,1,1,1,0,0,0,1,1,1,1,1,1,1},
@@ -69,7 +69,7 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		Building testBuilding = new Building(Building.Type.HOUSE, tiles[13][0]);
+		Building testBuilding = new Building(Building.Type.HOUSE, tiles[12][0]);
 		testBuilding.addMetadata("Name", "Hotel");
 		testBuilding.addMetadata("Description", "This is where Alice and Chad go when they get it on");
 		
@@ -78,28 +78,61 @@ public class GameModel {
 		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
 		
 		NPC testEntity = new NPC(NPC.Type.STUDENT, tiles[0][2]);
-		NPC testEntity2 = new NPC(NPC.Type.HERO, tiles[2][2]);
-		NPC testEntity3 = new NPC(NPC.Type.POLICE, tiles[13][14]);
 		testEntity.addMetadata("Name", "Alice");
 		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
-		
-		testEntity.addObjective(testEntity2, testEntity3);
-		testEntity.addObjective(testEntity3, testBuilding);
-		testEntity2.addObjective(testEntity, testBuilding2);
-		
+
+		NPC testEntity2 = new NPC(NPC.Type.HERO, tiles[2][2]);
 		testEntity2.addMetadata("Name", "Bob");
 		testEntity2.addMetadata("Description", "Bob is a hardworking family man");
-		
+		testEntity.setTargetEntity(testEntity2);
+
+		NPC testEntity3 = new NPC(NPC.Type.FACULTY, tiles[13][14]);
 		testEntity3.addMetadata("Name", "Chad");
 		testEntity3.addMetadata("Description", "Fucking Chad");
 		
-		testEntity3.addObjective(testEntity,  testBuilding);
+		NPC testEntity4 = new NPC(NPC.Type.FACULTY, tiles[2][7]);
+		testEntity4.addMetadata("Name", "Bob's Bad Influence #1");
+		testEntity4.addMetadata("Description", "Always distracts Bob");
+
+		NPC testEntity5 = new NPC(NPC.Type.FACULTY, tiles[11][11]);
+		testEntity5.addMetadata("Name", "Bob's Bad Influence #2");
+		testEntity5.addMetadata("Description", "Always distracts Bob");
+
+		NPC testEntity6 = new NPC(NPC.Type.POLICE, tiles[9][7]);
+		testEntity6.addMetadata("Name", "POPO");
+		testEntity6.addMetadata("Description", "Reminds Bob to be an upstanding, working citizen");
 		
+		NPC testEntity7 = new NPC(NPC.Type.FACULTY, tiles[11][3]);
+		testEntity7.addMetadata("Name", "Some Random Dude");
+		testEntity7.addMetadata("Description", "He looks a stoned");
+		
+		NPC testEntity8 = new NPC(NPC.Type.FACULTY, tiles[11][4]);
+		testEntity8.addMetadata("Name", "Runner");
+		testEntity8.addMetadata("Description", "He likes shorts. They're comfortable and easy to wear");
+
+		testEntity.addObjective(testEntity2, testEntity3);
+		testEntity.addObjective(testEntity3, testBuilding);
+		testEntity2.addObjective(testEntity, testBuilding2);
+		testEntity2.addObjective(testEntity4,  testEntity5);
+		testEntity2.addObjective(testEntity5,  testEntity4);
+		testEntity2.addObjective(testEntity6, testBuilding2);
+		testEntity3.addObjective(testEntity,  testBuilding);
+		testEntity8.setTargetEntity(testEntity7);
+		testEntity8.addObjective(testEntity6, testEntity5);
+		testEntity8.addObjective(testEntity5, testEntity7);
+		testEntity8.addObjective(testEntity7, testEntity6);
+
+		em.addEntity(testBuilding);
+		em.addEntity(testBuilding2);
 		em.addEntity(testEntity);
 		em.addEntity(testEntity2);
 		em.addEntity(testEntity3);
+		em.addEntity(testEntity4);
+		em.addEntity(testEntity5);
+		em.addEntity(testEntity6);
+		em.addEntity(testEntity7);
+		em.addEntity(testEntity8);
 		testEntity.move(Direction.NORTH);
-		testEntity.setTargetEntity(testEntity2);
 		
 		this.listeners = new ArrayList<StateChangedListener<GameModel>>();
 	}

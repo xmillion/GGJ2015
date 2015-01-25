@@ -9,6 +9,7 @@ public class NPC extends Entity {
 		NONE("main"),
 		HERO("old"),
 		POLICE("redshirt"),
+		FACULTY("redshirt"),
 		STUDENT("young");
 		
 		public final String assetName;
