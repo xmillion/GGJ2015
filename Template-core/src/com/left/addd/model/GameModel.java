@@ -38,10 +38,16 @@ public class GameModel {
 		this.height = height;
 		this.tiles = new Tile[width][height];
 		this.entity_list = new ArrayList<Entity>();
+		Network bob = new Network(NetworkType.ROAD);
 		if(initializeTiles) {
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
-					tiles[i][j] = new Tile(this, i, j);
+					if (i == 2) {
+						tiles[i][j] = new Tile(this, i, j, bob);
+						tiles[i][j].setNetwork(bob);
+					} else {
+						tiles[i][j] = new Tile(this, i, j);
+					}
 				}
 			}
 		}
@@ -49,12 +55,13 @@ public class GameModel {
 		this.time = new Time(timeInHours);
 		
 		this.entities = new ArrayList<Entity>();
-		Entity testEntity = new Entity(tiles[0][1]);
-		Entity testEntity2 = new Entity(tiles[0][2]);
+		Entity testEntity = new Entity(tiles[2][0]);
+		Entity testEntity2 = new Entity(tiles[2][0]);
+		testEntity.setTargetEntity(new Entity(new Tile(this,2,12)));
+		testEntity2.setTargetEntity(new Entity(new Tile(this,2,24)));
 		entities.add(testEntity);
 		entities.add(testEntity2);
-		testEntity.move(Direction.NORTH);
-		testEntity.move(Direction.EAST);
+		
 		
 		this.listeners = new ArrayList<StateChangedListener>();
 	}
@@ -179,6 +186,8 @@ public class GameModel {
 			Entity entity = Entity.load(json, entityValue, gameModel);
 			gameModel.entity_list.add(entity);
 		}
+		
+		
 		
 
 		return gameModel;

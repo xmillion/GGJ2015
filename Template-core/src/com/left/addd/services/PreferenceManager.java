@@ -30,7 +30,7 @@ public class PreferenceManager {
 	}
 	
 	public float getSoundVolume() {
-		return prefs.getFloat(SOUND_VOL, 1f);
+		return prefs.getFloat(SOUND_VOL, 0f);
 	}
 	
 	public void setMusicOn(boolean on) {
@@ -48,7 +48,7 @@ public class PreferenceManager {
 	}
 	
 	public float getMusicVolume() {
-		return prefs.getFloat(MUSIC_VOL, 1f);
+		return prefs.getFloat(MUSIC_VOL, 0f);
 	}
 	
 	public void clearPrefs() {

@@ -89,6 +89,9 @@ public class Entity {
 	}
 
 	public boolean move(Direction dir) {
+		if (dir == null) {
+			return false;
+		}
 		Tile next = currentTile.getNeighbour(dir);
 		if (!Tile.isDummyTile(next)) {
 			nextTile = next;
@@ -118,7 +121,25 @@ public class Entity {
 			finishedMoving();
 
 			// TODO determine nextTile based on a pathfinder
-			move(Direction.EAST);
+//			move(Direction.EAST);
+//			findPathToTarget();
+			move(getDirection());
+		}
+	}
+	
+	protected Direction getDirection() {
+		if (nextTile.y - currentTile.y > 0) {
+			return Direction.NORTH;
+		} else if (nextTile.y == currentTile.y) {
+			if (nextTile.x - currentTile.x > 0) {
+				return Direction.EAST;
+			} else if (nextTile.x == currentTile.x) {
+				return null;
+			} else {
+				return Direction.WEST;
+			}
+		} else {
+			return Direction.SOUTH;
 		}
 	}
 

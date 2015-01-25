@@ -101,24 +101,28 @@ public class Tile {
 		return Tile.isDummyTile(t) ? defaultTile : t;
 	}
 	
-	public Tile[] getNeighbours() {
+	public ArrayList<Tile> getNeighbours() {
         ArrayList<Tile> Available = new ArrayList<Tile>();
         for (Direction dir : Direction.values()) {
             if (checkForNetwork(dir)) {
                 Available.add(getNeighbour(dir));
             }
         }
-        return (Tile[]) Available.toArray();
+        return Available;
     }
     
     
     private boolean checkForNetwork(Direction dir) {
         if (!this.equals(getNeighbour(dir))) {
-            if (getNeighbour(dir).getNetwork().type == NetworkType.ROAD) {
-                return true;
-            } else {
-                return false;
-            }
+        	if (getNeighbour(dir).getNetwork() != null) {
+        		if (getNeighbour(dir).getNetwork().type == NetworkType.ROAD) {
+                    return true;
+                } else {
+                    return false;
+                }
+        	} else {
+        		return false;
+        	}
         } else {
             return false;
         }
