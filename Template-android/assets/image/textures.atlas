@@ -1,12 +1,61 @@
 
 textures.png
-size: 64,64
+size: 256,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-entities/main
+entities/bstudent
   rotate: false
   xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/factory
+  rotate: false
+  xy: 2, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+entities/house
+  rotate: false
+  xy: 200, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/library
+  rotate: false
+  xy: 68, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+entities/main
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/school
+  rotate: false
+  xy: 134, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+entities/student
+  rotate: false
+  xy: 70, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/teacher
+  rotate: false
+  xy: 104, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
