@@ -49,8 +49,8 @@ public class GameModel {
 		this.time = new Time(timeInHours);
 		
 		this.entities = new ArrayList<Entity>();
-		Entity testEntity = new Entity("testentity", tiles[0][1], tiles[2][12]);
-		Entity testEntity2 = new Entity("testentity2", tiles[0][2], tiles[2][12]);
+		Entity testEntity = new Entity(tiles[0][1]);
+		Entity testEntity2 = new Entity(tiles[0][2]);
 		entities.add(testEntity);
 		entities.add(testEntity2);
 		testEntity.move(Direction.NORTH);
@@ -107,16 +107,6 @@ public class GameModel {
 
 		// Tile data
 		query.append("Tile " + pCoords(tile.x, tile.y));
-
-		// Building data
-		/*if(tile.hasBuilding()) {
-			Building b = tile.getBuilding();
-			query.append("Building: " + b.type.name());
-			query.append(" Origin=" + pCoords(b.getOriginX(), b.getOriginY()));
-			query.append(" Size=" + b.getWidth() + "x" + b.getHeight());
-		} else {
-			query.append("No building");
-		}*/
 		query.append(".\n");
 
 		// Network data
