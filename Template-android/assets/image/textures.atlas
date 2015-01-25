@@ -4,13 +4,6 @@ size: 256,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-entities/bstudent
-  rotate: false
-  xy: 2, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
 entities/factory
   rotate: false
   xy: 2, 36
@@ -20,7 +13,7 @@ entities/factory
   index: -1
 entities/house
   rotate: false
-  xy: 200, 68
+  xy: 2, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -34,7 +27,21 @@ entities/library
   index: -1
 entities/main
   rotate: false
+  xy: 200, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/old
+  rotate: false
   xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/redshirt
+  rotate: false
+  xy: 70, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -46,14 +53,7 @@ entities/school
   orig: 64, 64
   offset: 0, 0
   index: -1
-entities/student
-  rotate: false
-  xy: 70, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
-entities/teacher
+entities/young
   rotate: false
   xy: 104, 2
   size: 32, 32

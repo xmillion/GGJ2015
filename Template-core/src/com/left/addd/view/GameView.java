@@ -42,7 +42,7 @@ import com.left.addd.view.TileImageType;
  * Manages the drawing of the model to the screen and player controls. Reference:
  * https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
-public class GameView implements InputProcessor, StateChangedListener {
+public class GameView implements InputProcessor, StateChangedListener<GameModel> {
 	public static final int TILE_LENGTH = 32;
 
 	private final AdddGame game;
@@ -79,7 +79,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 	private static final Color blankColor = new Color(1, 1, 1, 1);
 
 	// Tile rendering data
-	private List<EntitySprite> entitySprites;
+	private EntityView entityView;
 
 	// Assets
 	private final Map<TileImageType, Image> tileImageCache;
@@ -119,7 +119,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 		tooltip = new Vector3();
 		tooltipEntity = null;
 
-		entitySprites = new ArrayList<EntitySprite>();
+		entityView = new EntityView(atlas);
 
 		// Load all the tile images into cache
 		this.tileImageCache = new EnumMap<TileImageType, Image>(TileImageType.class);
@@ -276,34 +276,26 @@ public class GameView implements InputProcessor, StateChangedListener {
 			if(setClickTileFromScreen(screenX, screenY)) {
 				// check if there is an entity on top
 				boolean targetFound = false;
-				for(EntitySprite e: entitySprites) {
-					if (!targetFound && isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth() / TILE_LENGTH, e.getHeight() / TILE_LENGTH)) {
-						// show information and actions for the entity
-						log("Target found " + pCoords(e.getX(), e.getY()));
-						e.select();
-						targetFound = true;
-					} else {
-						e.deselect();
-					}
+				Entity entity = entityView.selectEntityInTarget(clickCoordinate.x, clickCoordinate.y);
+				if (entity != null) {
+					log("Target found " + pCoords(entity.getCurrentTile()));
+					tooltipEntity = entity;
+					targetFound = true;
+				}
+				
+				// Interact with tile
+				if (!targetFound) {
+					touchTile();
 				}
 			}
 		} else if(button == Buttons.RIGHT) {
 			// set the tile coordinates
 			if (setRightClickTileFromScreen(screenX, screenY)) {
 				// deselect all entities
-				for(EntitySprite e: entitySprites) {
-					e.deselect();
-				}
+				entityView.deselectAllEntities();
 			}
 		}
-
-		if(button == Buttons.RIGHT) {
-			// Deselect
-			return true;
-		} else if(setClickTileFromScreen(screenX, screenY)) {
-			// Interact with tile
-			touchTile();
-		}
+		
 		return true;
 	}
 
@@ -460,9 +452,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 	}
 
 	private void renderEntities(SpriteBatch batch, float delta) {
-		for (EntitySprite es : entitySprites) {
-			es.getImageForRender(delta).draw(batch, 1f);
-		}
+		entityView.render(batch, delta);
 	}
 
 	private void renderTooltip(SpriteBatch batch) {
@@ -470,14 +460,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 		font.setColor(Color.DARK_GRAY);
 		float tooltipOffset = 10;
 		float lineHeight = 16;
-		Entity te = null;
-		for (EntitySprite es: entitySprites) {
-			if((es.getX()*TILE_LENGTH < tooltip.x && (es.getX()*TILE_LENGTH + es.getWidth()) > tooltip.x) &&
-			   (es.getY()*TILE_LENGTH < tooltip.y && (es.getY()*TILE_LENGTH + es.getHeight()) > tooltip.y)) {
-				te = es.getEntity();
-				break;
-			}
-		}
+		Entity te = tooltipEntity;
 		if (te != null) {
 			Set<String> keys = te.getMetadata().keySet();
 			int lineCount = 0;
@@ -504,23 +487,11 @@ public class GameView implements InputProcessor, StateChangedListener {
 		viewCamera.update();
 	}
 
-	public void OnStateChanged() {
+	public void OnStateChanged(GameModel gameModel) {
 		log("GameView", "GameModel state changed");
 		final List<Entity> entities = gameModel.getEntities();
-		if(entities.size() != entitySprites.size()) {
-			// regenerate view
-			entitySprites.clear();
-			for(int i = 0; i < entities.size(); i++) {
-				EntitySprite entitySprite = new EntitySprite(atlas, entities.get(i));
-				entitySprite.create();
-				entitySprites.add(entitySprite);
-			}
+		for(Entity e: entities) {
+			e.addStateChangedListener(entityView);
 		}
-	}
-
-	private static boolean isTargetInRect(float targetX, float targetY, float x, float y, float width, float height) {
-		log ("Target " + pCoords(targetX, targetY) + " Rect " + pCoords(x, y) + " " + pCoords(x+width, y+height));
-
-		return (targetX >= x && targetY >= y && targetX < x + width && targetY < y + height);
 	}
 }

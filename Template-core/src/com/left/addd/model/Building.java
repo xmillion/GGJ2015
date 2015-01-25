@@ -3,11 +3,26 @@ package com.left.addd.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class Building extends Entity{
+public class Building extends Entity {
 
-	public final BuildingType type;
+	public enum Type {
+		NONE(1, 1, "tile"),
+		HOUSE(1, 1, "house"),
+		FACTORY(2, 2, "factory");
+		
+		public final int width;
+		public final int height;
+		public final String assetName;
+		private Type(int width, int height, String assetName) {
+			this.width = width;
+			this.height = height;
+			this.assetName = assetName;
+		}
+	}
+	
+	public final Type type;
 
-	public Building(BuildingType type, Tile currentTile) {
+	public Building(Type type, Tile currentTile) {
 		super(currentTile);
 		this.type = type;
 	}
@@ -20,9 +35,8 @@ public class Building extends Entity{
 		return type.height;
 	}
 	
-	// *** Rules ***
-
-	public void update(int delta) {
+	public Type getType() {
+		return type;
 	}
 	
 	// *** Serialization ***
@@ -52,7 +66,7 @@ public class Building extends Entity{
 	public static Building load(Json json, JsonValue jsonData, GameModel gameModel) {
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
-		BuildingType type = BuildingType.valueOf(jsonData.getString("building_type"));
+		Type type = Type.valueOf(jsonData.getString("building_type"));
 		return new Building(type, gameModel.getTile(x, y));
 	}
 }

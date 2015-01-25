@@ -6,7 +6,6 @@ import static com.left.addd.utils.Log.pCoords;
 import java.util.PriorityQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.List;
 
 import com.badlogic.gdx.utils.Json;
@@ -22,7 +21,7 @@ public class Entity {
 	private int moveProgress;
 
 	// this is willis's 11am event handling implementation
-	private List<StateChangedListener> listeners;
+	private List<StateChangedListener<Entity>> listeners;
 	
 	/**
 	 * Metadata of the entity (used to store strings, sprite dimension info etc)
@@ -40,7 +39,7 @@ public class Entity {
 
 		this.moveDuration = 1;
 		this.moveProgress = 0;
-		this.listeners = new ArrayList<StateChangedListener>(1);
+		this.listeners = new ArrayList<StateChangedListener<Entity>>(1);
 		
 		mMetadata = new HashMap<String,Object>();
 		mObjectives = new HashMap<Entity,Entity>();
@@ -78,9 +77,11 @@ public class Entity {
 		return moveProgress;
 	}
 
-	public void addStateChangedListener(StateChangedListener listener) {
-		this.listeners.add(listener);
-		listener.OnStateChanged();
+	public void addStateChangedListener(StateChangedListener<Entity> listener) {
+		if (!listeners.contains(listener)) {
+			this.listeners.add(listener);
+			listener.OnStateChanged(this);
+		}
 	}
 
 	public boolean move(Direction dir) {
@@ -140,8 +141,8 @@ public class Entity {
 	}
 
 	private void stateChanged() {
-		for(StateChangedListener l : listeners) {
-			l.OnStateChanged();
+		for(StateChangedListener<Entity> l : listeners) {
+			l.OnStateChanged(this);
 		}
 	}
 
@@ -243,16 +244,16 @@ public class Entity {
 	 * @return
 	 */
 	public static Entity load(Json json, JsonValue jsonData, GameModel gameModel) {
-		EntityType type = EntityType.valueOf(jsonData.getString("entity_type"));
+		//EntityType type = EntityType.valueOf(jsonData.getString("entity_type"));
 		// TODO load metadata
-		if (type==EntityType.BUILDING){
-			Entity building = Building.load(json, jsonData, gameModel);
-			return building;
-		} else {
+		//if (type==EntityType.BUILDING){
+		//	Entity building = Building.load(json, jsonData, gameModel);
+		//	return building;
+		//} else {
 			int x = jsonData.getInt("x");
 			int y = jsonData.getInt("y");
 			return new Entity(gameModel.getTile(x, y));
-		}
+		//}
 	}
 	
 	public Entity getTargetEntity() {

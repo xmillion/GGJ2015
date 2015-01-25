@@ -26,7 +26,7 @@ public class GameModel {
 	public final int height;
 	private Time time;
 	
-	private List<StateChangedListener> listeners;
+	private List<StateChangedListener<GameModel>> listeners;
 	
 	EntityManager em = EntityManager.getInstance();
 
@@ -69,17 +69,17 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		Building testBuilding = new Building(BuildingType.HOUSE, tiles[13][0]);
+		Building testBuilding = new Building(Building.Type.HOUSE, tiles[13][0]);
 		testBuilding.addMetadata("Name", "Hotel");
 		testBuilding.addMetadata("Description", "This is where Alice and Chad go when they get it on");
 		
-		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[1][13]);
+		Building testBuilding2 = new Building(Building.Type.FACTORY, tiles[1][13]);
 		testBuilding2.addMetadata("Name", "Bob's Workplace");
 		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
 		
-		Hero testEntity = new Hero(HeroType.ARTIST, tiles[0][2]);
-		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[2][2]);
-		NPC testEntity3 = new NPC(NPCType.POLICE, tiles[13][14]);
+		NPC testEntity = new NPC(NPC.Type.STUDENT, tiles[0][2]);
+		NPC testEntity2 = new NPC(NPC.Type.HERO, tiles[2][2]);
+		NPC testEntity3 = new NPC(NPC.Type.POLICE, tiles[13][14]);
 		testEntity.addMetadata("Name", "Alice");
 		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
 		
@@ -101,7 +101,7 @@ public class GameModel {
 		testEntity.move(Direction.NORTH);
 		testEntity.setTargetEntity(testEntity2);
 		
-		this.listeners = new ArrayList<StateChangedListener>();
+		this.listeners = new ArrayList<StateChangedListener<GameModel>>();
 	}
 	
 	public Tile getTileByEntityProperty(){
@@ -128,9 +128,9 @@ public class GameModel {
 		return tiles[x][y];
 	}
 	
-	public void addListener(StateChangedListener listener) {
+	public void addListener(StateChangedListener<GameModel> listener) {
 		this.listeners.add(listener);
-		listener.OnStateChanged();
+		listener.OnStateChanged(this);
 	}
 	
 	/**

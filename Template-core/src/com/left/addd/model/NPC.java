@@ -3,13 +3,29 @@ package com.left.addd.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class NPC extends Entity{
+public class NPC extends Entity {
+	
+	public enum Type {
+		NONE("main"),
+		HERO("old"),
+		POLICE("redshirt"),
+		STUDENT("young");
+		
+		public final String assetName;
+		private Type(String assetName) {
+			this.assetName = assetName;
+		}
+	}
 
-	public final NPCType type;
+	public final Type type;
 
-	public NPC(NPCType type, Tile currentTile) {
+	public NPC(Type type, Tile currentTile) {
 		super(currentTile);
 		this.type = type;
+	}
+	
+	public Type getType() {
+		return type;
 	}
 	
 	// *** Serialization ***
@@ -39,7 +55,7 @@ public class NPC extends Entity{
 	public static NPC load(Json json, JsonValue jsonData, GameModel gameModel) {
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
-		NPCType type = NPCType.valueOf(jsonData.getString("npc_type"));
+		Type type = Type.valueOf(jsonData.getString("npc_type"));
 		return new NPC(type, gameModel.getTile(x, y));
 	}
 }
