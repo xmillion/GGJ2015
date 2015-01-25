@@ -4,6 +4,7 @@ import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.badlogic.gdx.utils.Json;
@@ -11,11 +12,10 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class Entity {
 
-	private String name;
-	private EntityModel model;
+
 	private Tile currentTile;
 	private Tile nextTile;
-	private Tile objectiveTile;
+
 
 	/** Number of ticks to move to an adjacent tile */
 	private int moveDuration;
@@ -23,28 +23,33 @@ public class Entity {
 
 	// this is willis's 11am event handling implementation
 	private List<StateChangedListener> listeners;
+	
+	/**
+	 * Metadata of the entity (used to store strings, sprite dimension info etc)
+	 */
+	private final HashMap<String,Object> mMetadata;
+	
+	/*
+	 * Current state of the entity and its actions
+	 */
+	private EntityState mCurrentState;
+	
+	private HashMap<Entity,Entity> mObjectives;
+	
+	private Entity mTargetEntity;
 
-	public Entity(String name, Tile currentTile, Tile objectiveTile) {
-		this.name = name;
+	public Entity(Tile currentTile) {
+		
 		this.currentTile = currentTile;
 		this.nextTile = currentTile;
-		this.objectiveTile = objectiveTile;
 
 		this.moveDuration = 3;
 		this.moveProgress = 0;
 		this.listeners = new ArrayList<StateChangedListener>(1);
-	}
-
-	public Entity(String name, Tile currentTile) {
-		this(name, currentTile, currentTile);
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		
+		mMetadata = new HashMap<String,Object>();
+		mObjectives = new HashMap<Entity,Entity>();
+		mTargetEntity = null;
 	}
 
 	public Tile getCurrentTile() {
@@ -64,14 +69,6 @@ public class Entity {
 		// make this private, it should be determined by a pathfinder
 		this.nextTile = t;
 		stateChanged();
-	}
-
-	public Tile getObjectiveTile() {
-		return objectiveTile;
-	}
-
-	public void setObjectiveTile(Tile t) {
-		this.objectiveTile = t;
 	}
 
 	public int getMoveDuration() {
@@ -162,6 +159,73 @@ public class Entity {
 			return building;
 		} else {
 			return null;
+		}
+	}
+	
+	public void setCurrentState(EntityState es) {
+		mCurrentState = es;
+	}
+	
+	public EntityState getCurrentState() {
+		return mCurrentState;
+	}
+	
+	public Entity getTargetEntity() {
+		return mTargetEntity;
+	}
+	
+	public void setTargetEntity(Entity targetEntity) {
+		mTargetEntity = targetEntity;
+	}
+	
+	public HashMap<Entity,Entity> getObjectives() {
+		return mObjectives;
+	}
+	
+
+	/**
+	 * Private class to keep track of the states of the entity
+	 * @author kev
+	 *
+	 */
+	public class EntityState {
+		
+		private int mX;
+		private int mY;
+		private Tile mNextTile;
+		
+		public EntityState() {
+			mX = 0;
+			mY = 0;
+		}
+		
+		public EntityState(int x, int y) {
+			mX = x;
+			mY = y;
+		}
+		
+		public void setX(int x) {
+			mX = x;
+		}
+		
+		public int getX() {
+			return mX;
+		}
+		
+		public void setY(int y) {
+			mY = y;
+		}
+		
+		public int getY() {
+			return mY;
+		}
+		
+		public void setNextTile(Tile next) {
+			mNextTile = next;
+		}
+		
+		public Tile getNextTile() {
+			return mNextTile;
 		}
 	}
 }

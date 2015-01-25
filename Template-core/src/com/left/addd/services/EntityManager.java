@@ -3,16 +3,15 @@ package com.left.addd.services;
 import java.util.ArrayList;
 import java.util.Set;
 
-import com.left.addd.model.EntityModel;
-import com.left.addd.model.EntityModel.EntityState;
+import com.left.addd.model.Entity;
 
 public class EntityManager {
 	
-	private static ArrayList<EntityModel> entityPool;
+	private static ArrayList<Entity> entityPool;
 	private static EntityManager manager;
 	
 	public EntityManager() {
-		entityPool = new ArrayList<EntityModel>();
+		entityPool = new ArrayList<Entity>();
 	}
 	
 	public static EntityManager getInstance() {
@@ -22,18 +21,18 @@ public class EntityManager {
 		return manager;
 	}
 	
-	public static void addEntity(EntityModel em) {
+	public static void addEntity(Entity em) {
 		entityPool.add(em);
 	}
 	
-	public static void freeEntity(EntityModel em) {
+	public static void freeEntity(Entity em) {
 		entityPool.remove(em);
 	}
 	
 	public static void checkObjectivesAndUpdateTargets() {
-		for (EntityModel em : entityPool) {
-			Set<EntityModel> objectives = em.getObjectives().keySet();
-			for(EntityModel o : objectives) {
+		for (Entity em : entityPool) {
+			Set<Entity> objectives = em.getObjectives().keySet();
+			for(Entity o : objectives) {
 				if (checkAdjacency(em,o)) {
 					em.setTargetEntity(o);
 					break;
@@ -42,7 +41,7 @@ public class EntityManager {
 		}
 	}
 	
-	private static boolean checkAdjacency(EntityModel e1, EntityModel e2) {
+	private static boolean checkAdjacency(Entity e1, Entity e2) {
 		int e1_x = e1.getCurrentState().getX();
 		int e1_y = e1.getCurrentState().getY();
 		
