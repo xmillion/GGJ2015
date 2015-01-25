@@ -16,7 +16,7 @@ public class GameScreen extends AbstractScreen {
 	private UIView uiView;
 
 	public GameScreen(AdddGame game) {
-		this(game, new GameModel(30, 20));
+		this(game, new GameModel(15, 15));
 	}
 	
 	public GameScreen(AdddGame game, GameModel model) {

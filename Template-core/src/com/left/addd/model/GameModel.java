@@ -39,26 +39,47 @@ public class GameModel {
 		this.height = height;
 		this.tiles = new Tile[width][height];
 		if(initializeTiles) {
+			int[][] testMap = new int[][]{
+					{0,0,1,1,0,0,0,0,0,0,0,0,0,0,0},
+					{0,0,0,1,0,0,0,0,0,1,1,1,1,1,1},
+					{0,0,1,1,1,1,0,0,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
+					{1,1,1,1,1,0,0,0,0,0,0,0,1,0,0},
+					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
+					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
+					{1,0,0,0,1,1,1,1,1,1,1,1,1,0,0},
+					{0,0,0,0,1,0,0,0,1,0,0,0,0,0,1},
+					{1,1,1,1,1,0,0,0,1,1,1,1,1,1,1},
+			};
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
-					tiles[i][j] = new Tile(this, i, j, new Network(NetworkType.ROAD, null, null, this.getTile(i, j-1).getNetwork(), this.getTile(i-1, j).getNetwork()));
-				}
+					if (testMap[i][j] == 1){
+						tiles[i][j] = new Tile(this, i, j, new Network(NetworkType.ROAD, null, null, this.getTile(i, j-1).getNetwork(), this.getTile(i-1, j).getNetwork()));
+						} else {
+							tiles[i][j] = new Tile(this, i, j, null);
+						}
+					}
 			}
 		}
 		
 		this.time = new Time(timeInHours);
 		
-		Building testBuilding = new Building(BuildingType.HOUSE, tiles[5][1]);
+		Building testBuilding = new Building(BuildingType.HOUSE, tiles[13][0]);
 		testBuilding.addMetadata("Name", "Hotel");
 		testBuilding.addMetadata("Description", "This is where Alice and Chad go when they get it on");
 		
-		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[4][10]);
+		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[1][13]);
 		testBuilding2.addMetadata("Name", "Bob's Workplace");
 		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
 		
-		Hero testEntity = new Hero(HeroType.ARTIST, tiles[2][1]);
-		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[1][4]);
-		NPC testEntity3 = new NPC(NPCType.POLICE, tiles[10][10]);
+		Hero testEntity = new Hero(HeroType.ARTIST, tiles[0][2]);
+		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[2][2]);
+		NPC testEntity3 = new NPC(NPCType.POLICE, tiles[13][14]);
 		testEntity.addMetadata("Name", "Alice");
 		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
 		
