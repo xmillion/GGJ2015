@@ -77,6 +77,14 @@ public class GameModel {
 		testBuilding2.addMetadata("Name", "Bob's Workplace");
 		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
 		
+		Building testBuilding3 = new Building(Building.Type.SCHOOL, tiles[5][3]);
+		testBuilding3.addMetadata("Name", "School");
+		testBuilding3.addMetadata("Description", "This is Alice's school");
+		
+		Building testBuilding4 = new Building(Building.Type.LIBRARY, tiles[10][13]);
+		testBuilding4.addMetadata("Name", "Library");
+		testBuilding4.addMetadata("Description", "Students study here");
+		
 		NPC testEntity = new NPC(NPC.Type.STUDENT, tiles[0][2]);
 		testEntity.addMetadata("Name", "Alice");
 		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
@@ -124,6 +132,8 @@ public class GameModel {
 
 		em.addEntity(testBuilding);
 		em.addEntity(testBuilding2);
+		em.addEntity(testBuilding3);
+		em.addEntity(testBuilding4);
 		em.addEntity(testEntity);
 		em.addEntity(testEntity2);
 		em.addEntity(testEntity3);

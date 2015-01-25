@@ -307,9 +307,10 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 		isHovering = setHoverTileFromScreen(screenX, screenY);
 		if(isHovering) {
 			boolean targetFound = false;
-			tooltipEntity = entityView.selectEntityInTarget(hoverCoordinate.x, hoverCoordinate.y);
-			if (tooltipEntity != null) {
-				log("Target found " + pCoords(tooltipEntity.getCurrentTile()));
+			Entity entity = entityView.selectEntityInTarget(hoverCoordinate.x, hoverCoordinate.y);
+			if (entity != null) {
+				log("Target found " + pCoords(entity.getCurrentTile()));
+				tooltipEntity = entity;
 				targetFound = true;
 			}
 			
@@ -473,9 +474,9 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 				lineCount++;
 			}
 			if(te.getTargetEntity() != null)
-				font.draw(batch, "Target: "+te.getTargetEntity().getCurrentTile().toString() , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
+				font.draw(batch, "Target: " + te.getTargetEntity().getMetadata().get("Name"), tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
 			else {
-				font.draw(batch, "afk" , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
+				font.draw(batch, "No target." , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
 			}
 		}
 	}

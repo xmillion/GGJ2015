@@ -75,7 +75,7 @@ public class EntityView implements StateChangedListener<Entity> {
 			Tile next = cEntity.getNextTile();
 			if (current.equals(next)) {
 				// entity is no longer moving
-				log("Entity " + entity.getMetadata().get("Name") + " no longer moving" + pCoords(current));
+				//log("Entity " + entity.getMetadata().get("Name") + " no longer moving" + pCoords(current));
 				if (entityMap.containsKey(entity)) {
 					EntityRenderer e = entityMap.get(entity);
 					e.end(current.x, current.y);
@@ -87,7 +87,7 @@ public class EntityView implements StateChangedListener<Entity> {
 				}
 			} else {
 				// entity is now moving
-				log("Entity " + entity.getMetadata().get("Name") + " now moving" + pCoords(current));
+				//log("Entity " + entity.getMetadata().get("Name") + " now moving" + pCoords(current));
 				if (entityMap.containsKey(entity)) {
 					EntityRenderer e = entityMap.get(entity);
 					e.start(current.x, current.y, next.x, next.y, Time.getRealTimeFromTicks(cEntity.getMoveDuration()));
@@ -99,7 +99,7 @@ public class EntityView implements StateChangedListener<Entity> {
 				}
 			}
 		} else if (entity instanceof Building) {
-			log ("Building " + entity.getMetadata().get("Name") + " at " + pCoords(entity.getCurrentTile()));
+			//log ("Building " + entity.getMetadata().get("Name") + " at " + pCoords(entity.getCurrentTile()));
 			Building bEntity = (Building) entity;
 			Tile current = bEntity.getCurrentTile();
 			Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + bEntity.getType().assetName)));

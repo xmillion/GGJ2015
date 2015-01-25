@@ -8,7 +8,9 @@ public class Building extends Entity {
 	public enum Type {
 		NONE(1, 1, "tile"),
 		HOUSE(1, 1, "house"),
-		FACTORY(2, 2, "factory");
+		FACTORY(2, 2, "factory"),
+		SCHOOL(2, 2, "school"),
+		LIBRARY(2, 2, "library");
 		
 		public final int width;
 		public final int height;
