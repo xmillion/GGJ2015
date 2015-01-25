@@ -8,6 +8,7 @@ import java.util.Set;
 public class EntityModel {
 	
 	private final long mId;
+	private final Entity mEntity;
 	private final String mName;
 	
 	/**
@@ -15,12 +16,14 @@ public class EntityModel {
 	 */
 	private final HashMap<String,Object> mMetadata;
 	
-	private HashMap<EntityState,EntityAction> mStateActionMap;
-	
 	/*
 	 * Current state of the entity and its actions
 	 */
 	private EntityState mCurrentState;
+	
+	private HashMap<EntityModel,EntityModel> mObjectives;
+	
+	private EntityModel mTargetEntity;
 	
 	/**
 	 * 
@@ -28,14 +31,21 @@ public class EntityModel {
 	 * @param name name of the entity
 	 * @param data stored metadata of the entity, it is a map of key value string pairs
 	 */
-	public EntityModel(long id, String name, HashMap<String,Object> metadata) {
+	public EntityModel(long id, Entity entity, String name, HashMap<String,Object> metadata) {
 		mId = id;
+		mEntity = entity;
 		mName = name;
 		mMetadata = metadata;
+		mObjectives = new HashMap<EntityModel,EntityModel>();
+		mTargetEntity = null;
 	}
 	
 	public long getId() {
 		return mId;
+	}
+	
+	public Entity getEntity() {
+		return mEntity;
 	}
 	
 	public String getName() {
@@ -70,53 +80,16 @@ public class EntityModel {
 		return mCurrentState;
 	}
 	
-	public void addToStateActionMap(EntityState es, EntityAction ea) {
-		mStateActionMap.put(es,ea);
+	public EntityModel getTargetEntity() {
+		return mTargetEntity;
 	}
 	
-	/**
-	 * @return gets the next action based on input state (does not validate constraints)
-	 */
-	public EntityAction getNextAction(EntityState es) {
-		return mStateActionMap.get(es);
+	public void setTargetEntity(EntityModel targetEntity) {
+		mTargetEntity = targetEntity;
 	}
 	
-	/**
-	 * Private class to keep track of the states of the entity
-	 * @author kev
-	 *
-	 */
-	public class EntityAction {
-
-		private EntityState mTargetState;
-		private int mSpeed;
-				
-		public EntityAction() {
-			mTargetState = new EntityState();
-			mSpeed = 0;
-		}
-		
-		public EntityAction(EntityState es, int speed) {
-			mTargetState = es;
-			mSpeed = speed;
-		}
-		
-		public EntityState getTargetState() {
-			return mTargetState;
-		}
-
-		public void setTargetState(EntityState es) {
-			mTargetState = es;
-		}
-
-		public int getSpeed() {
-			return mSpeed;
-		}
-
-		public void setSpeed(int speed) {
-			mSpeed = speed;
-		}
-
+	public HashMap<EntityModel,EntityModel> getObjectives() {
+		return mObjectives;
 	}
 	
 	/**
@@ -128,19 +101,16 @@ public class EntityModel {
 		
 		private int mX;
 		private int mY;
-		
-		private EntitySatisfactionConstraints constraints;
+		private Tile mNextTile;
 		
 		public EntityState() {
 			mX = 0;
 			mY = 0;
-			constraints = new EntitySatisfactionConstraints();
 		}
 		
 		public EntityState(int x, int y) {
 			mX = x;
 			mY = y;
-			constraints = new EntitySatisfactionConstraints();
 		}
 		
 		public void setX(int x) {
@@ -159,47 +129,13 @@ public class EntityModel {
 			return mY;
 		}
 		
-		public EntitySatisfactionConstraints getConstraints() {
-			return constraints;
+		public void setNextTile(Tile next) {
+			mNextTile = next;
 		}
 		
-		public boolean isSatisfied() {
-			return constraints.validateConstraints();
+		public Tile getNextTile() {
+			return mNextTile;
 		}
-		
-		// If we plan to not only compare x,y's for state, we will need to change this
-		// (and potentially serialize the state of its something fancy)
-		public boolean equals(EntityState state) {
-			if (mX == state.getX() &&
-				mY == state.getY()) {
-				return true;
-			}
-			return false;
-		}
-		
-	}
-	
-	public class EntitySatisfactionConstraints {
-		
-		private HashMap<EntityModel,EntityState> modelStateMap;
-		
-		public EntitySatisfactionConstraints() {
-			modelStateMap = new HashMap<EntityModel,EntityState>();
-		}
-		
-		public void addConstraint(EntityModel em, EntityState es) {
-			modelStateMap.put(em, es);
-		}
-		
-		public boolean validateConstraints() {
-			Set<EntityModel> keys = modelStateMap.keySet();
-			for (EntityModel k : keys) {
-				if(!modelStateMap.get(k).equals(k.getCurrentState()))
-					return false;
-			}
-			return true;
-		}
-		
 	}
 	
 }
