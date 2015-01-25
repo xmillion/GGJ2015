@@ -42,16 +42,16 @@ public class GameModel {
 			int[][] testMap = new int[][]{
 					{0,0,1,1,0,0,0,0,0,0,0,0,0,0,0},
 					{0,0,0,1,0,0,0,0,0,1,1,1,1,1,1},
-					{0,0,1,1,1,1,0,0,0,1,0,0,0,0,0},
-					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
+					{0,0,1,1,1,1,0,1,0,1,0,0,0,0,0},
+					{0,0,0,0,0,1,1,1,1,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
-					{1,1,1,1,1,0,0,0,0,0,0,0,1,0,0},
+					{1,1,1,1,1,0,0,0,1,0,0,0,1,0,0},
 					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
-					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
+					{1,0,0,0,1,0,0,0,0,0,0,1,1,0,0},
 					{1,0,0,0,1,1,1,1,1,1,1,1,1,0,0},
 					{0,0,0,0,1,0,0,0,1,0,0,0,0,0,1},
 					{1,1,1,1,1,0,0,0,1,1,1,1,1,1,1},
@@ -73,26 +73,40 @@ public class GameModel {
 		testBuilding.addMetadata("Name", "Hotel");
 		testBuilding.addMetadata("Description", "This is where Alice and Chad go when they get it on");
 		
-		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[1][13]);
+		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[1][12]);
 		testBuilding2.addMetadata("Name", "Bob's Workplace");
 		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
 		
 		Hero testEntity = new Hero(HeroType.ARTIST, tiles[0][2]);
-		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[2][2]);
-		NPC testEntity3 = new NPC(NPCType.POLICE, tiles[13][14]);
 		testEntity.addMetadata("Name", "Alice");
 		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
-		
-		testEntity.addObjective(testEntity2, testEntity3);
-		testEntity.addObjective(testEntity3, testBuilding);
-		testEntity2.addObjective(testEntity, testBuilding2);
-		
+
+		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[2][2]);
 		testEntity2.addMetadata("Name", "Bob");
 		testEntity2.addMetadata("Description", "Bob is a hardworking family man");
-		
+
+		NPC testEntity3 = new NPC(NPCType.FACULTY, tiles[13][14]);
 		testEntity3.addMetadata("Name", "Chad");
 		testEntity3.addMetadata("Description", "Fucking Chad");
 		
+		NPC testEntity4 = new NPC(NPCType.FACULTY, tiles[2][7]);
+		testEntity4.addMetadata("Name", "Bob's Bad Influence #1");
+		testEntity4.addMetadata("Description", "Always distracts Bob");
+
+		NPC testEntity5 = new NPC(NPCType.FACULTY, tiles[11][11]);
+		testEntity5.addMetadata("Name", "Bob's Bad Influence #2");
+		testEntity5.addMetadata("Description", "Always distracts Bob");
+
+		NPC testEntity6 = new NPC(NPCType.POLICE, tiles[9][7]);
+		testEntity6.addMetadata("Name", "POPO");
+		testEntity6.addMetadata("Description", "Reminds Bob to be an upstanding, working citizen");
+
+		testEntity.addObjective(testEntity2, testEntity3);
+		testEntity.addObjective(testEntity3, testBuilding);
+		testEntity2.addObjective(testEntity, testBuilding2);
+		testEntity2.addObjective(testEntity4,  testEntity5);
+		testEntity2.addObjective(testEntity5,  testEntity4);
+		testEntity2.addObjective(testEntity6, testBuilding2);
 		testEntity3.addObjective(testEntity,  testBuilding);
 		
 		em.addEntity(testEntity);
