@@ -6,10 +6,13 @@ import static com.left.addd.utils.Log.pCoords;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+
 public class Entity {
 
 	private String name;
-	private Tile currentTile;
+	protected Tile currentTile;
 	private Tile nextTile;
 	private Tile objectiveTile;
 	
@@ -29,6 +32,10 @@ public class Entity {
 		this.moveDuration = 3;
 		this.moveProgress = 0;
 		this.listeners = new ArrayList<StateChangedListener>(1);
+	}
+	
+	public Entity(String name, Tile currentTile) {
+		this(name, currentTile, currentTile);
 	}
 	
 	public String getName() {
@@ -120,6 +127,40 @@ public class Entity {
 	private void stateChanged() {
 		for(StateChangedListener l : listeners) {
 			l.OnStateChanged();
+		}
+	}
+	
+	// *** Serialization ***
+
+	/**
+	 * Serialize a Tile into json.
+	 * 
+	 * @param json Json serializer, which will now have the tile's data.
+	 * @param tile Tile to save
+	 */
+	public void save(Json json) {
+		/*
+		json.writeObjectStart("entity");
+		json.writeValue("ox", this.originX);
+		json.writeValue("oy", this.originY);
+		json.writeValue("type", this.type.name());
+		json.writeObjectEnd();
+		*/
+	}
+
+	/**
+	 * Create a Tile using a json string.
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public static Entity load(Json json, JsonValue jsonData, GameModel gameModel) {
+		EntityType type = EntityType.valueOf(jsonData.getString("entity_type"));
+		if (type==EntityType.BUILDING){
+			Entity building = Building.load(json, jsonData, gameModel);
+			return building;
+		} else {
+			return null;
 		}
 	}
 }

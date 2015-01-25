@@ -19,11 +19,11 @@ public class Tile {
 	private Network network;
 
 	public Tile(GameModel gameModel) {
-		this(gameModel, -1, -1, null, null);
+		this(gameModel, -1, -1, null);
 	}
 
 	public Tile(GameModel gameModel, int x, int y) {
-		this(gameModel, x, y, null, null);
+		this(gameModel, x, y, null);
 	}
 
 	/**
@@ -35,37 +35,24 @@ public class Tile {
 	 * @param building Building on this Tile
 	 * @param network Network on this Tile
 	 */
-	public Tile(GameModel gameModel, int x, int y, Building building, Network network) {
+	public Tile(GameModel gameModel, int x, int y, Network network) {
 		this.gameModel = gameModel;
 		this.x = x;
 		this.y = y;
 
-		this.building = building;
 		this.network = network;
 	}
 
 	public static Tile dummyTile() {
 		if(dummyTile == null) {
 			// never use other methods on dummyTiles
-			dummyTile = new Tile(null, -1, -1, null, null);
+			dummyTile = new Tile(null, -1, -1, null);
 		}
 		return dummyTile;
 	}
 
 	public static boolean isDummyTile(Tile t) {
 		return t.equals(dummyTile);
-	}
-
-	public Building getBuilding() {
-		return building;
-	}
-
-	public void setBuilding(Building building) {
-		this.building = building;
-	}
-
-	public boolean hasBuilding() {
-		return this.building != null;
 	}
 
 	public Network getNetwork() {
@@ -92,6 +79,10 @@ public class Tile {
 	public boolean hasNetwork() {
 		return this.network != null;
 	}
+	
+	public boolean hasBuilding(){
+		return false;
+	}
 
 	public Tile getNeighbour(Direction dir) {
 		switch(dir) {
@@ -117,9 +108,6 @@ public class Tile {
 	// *** Rules ***
 
 	public void update(int delta) {
-		if(building != null) {
-			building.update(delta);
-		}
 		if(network != null) {
 			network.update(delta);
 		}
@@ -137,9 +125,6 @@ public class Tile {
 		json.writeObjectStart();
 		json.writeValue("x", this.x);
 		json.writeValue("y", this.y);
-		if(hasBuilding()) {
-			building.save(json);
-		}
 		if(hasNetwork()) {
 			network.save(json);
 		}
@@ -156,12 +141,6 @@ public class Tile {
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
 
-		JsonValue buildingData = jsonData.get("building");
-		Building building = null;
-		if(buildingData != null) {
-			building = Building.load(json, buildingData);
-		}
-
 		JsonValue networkData = jsonData.get("network");
 		Network network = null;
 		if(networkData != null) {
@@ -171,7 +150,7 @@ public class Tile {
 					gameModel.getTile(x - 1, y).getNetwork());
 		}
 
-		return new Tile(gameModel, x, y, building, network);
+		return new Tile(gameModel, x, y, network);
 	}
 
 	/**

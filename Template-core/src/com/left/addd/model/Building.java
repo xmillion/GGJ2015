@@ -3,19 +3,16 @@ package com.left.addd.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class Building {
+public class Building extends Entity{
 
 	private int originX;
 	private int originY;
 
 	public final BuildingType type;
 
-	public Building(BuildingType type) {
-		this(type, 0, 0);
-	}
-
-	public Building(BuildingType type, int ox, int oy) {
-		setOrigin(ox, oy);
+	public Building(String name, BuildingType type, Tile currentTile) {
+		super(name, currentTile );
+		setOrigin(currentTile.x, currentTile.y);
 		this.type = type;
 	}
 
@@ -54,7 +51,7 @@ public class Building {
 	 * @param tile Tile to save
 	 */
 	public void save(Json json) {
-		json.writeObjectStart("building");
+		json.writeObjectStart("entity");
 		json.writeValue("ox", this.originX);
 		json.writeValue("oy", this.originY);
 		json.writeValue("type", this.type.name());
@@ -67,10 +64,11 @@ public class Building {
 	 * @param data
 	 * @return
 	 */
-	public static Building load(Json json, JsonValue jsonData) {
+	public static Building load(Json json, JsonValue jsonData, GameModel gameModel) {
 		int ox = jsonData.getInt("ox");
 		int oy = jsonData.getInt("oy");
-		BuildingType type = BuildingType.valueOf(jsonData.getString("type"));
-		return new Building(type, ox, oy);
+		String name = jsonData.getString("name");
+		BuildingType type = BuildingType.valueOf(jsonData.getString("building_type"));
+		return new Building(name, type, gameModel.getTile(ox, oy));
 	}
 }

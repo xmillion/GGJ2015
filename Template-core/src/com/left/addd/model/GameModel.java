@@ -11,6 +11,7 @@ import com.left.addd.model.GameModel;
 import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
+import java.util.ArrayList;
 
 /**
  * TemplateModel is the model for this game. It represents the logic behind this game.
@@ -22,6 +23,7 @@ public class GameModel {
 	public final int width;
 	public final int height;
 	private Time time;
+	private ArrayList<Entity> entity_list;
 	
 	private Entity testEntity;
 
@@ -33,6 +35,7 @@ public class GameModel {
 		this.width = width;
 		this.height = height;
 		this.tiles = new Tile[width][height];
+		this.entity_list = new ArrayList<Entity>();
 		if(initializeTiles) {
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
@@ -45,6 +48,10 @@ public class GameModel {
 		
 		this.testEntity = new Entity("testguy", tiles[0][1], tiles[2][12]);
 		testEntity.move(Direction.NORTH);
+	}
+	
+	public Tile getTileByEntityProperty(){
+		return new Tile(this,-1,-1,null);
 	}
 	
 	public Time getTime() {
@@ -88,14 +95,14 @@ public class GameModel {
 		query.append("Tile " + pCoords(tile.x, tile.y));
 
 		// Building data
-		if(tile.hasBuilding()) {
+		/*if(tile.hasBuilding()) {
 			Building b = tile.getBuilding();
 			query.append("Building: " + b.type.name());
 			query.append(" Origin=" + pCoords(b.getOriginX(), b.getOriginY()));
 			query.append(" Size=" + b.getWidth() + "x" + b.getHeight());
 		} else {
 			query.append("No building");
-		}
+		}*/
 		query.append(".\n");
 
 		// Network data
@@ -158,6 +165,15 @@ public class GameModel {
 			Tile tile = Tile.load(json, tileValue, gameModel);
 			gameModel.tiles[tile.x][tile.y] = tile;
 		}
+		
+		JsonValue entityData = jsonData.get("entities");
+		JsonValue entityValue;
+		for(int i = 0; i < entityData.size; i++) {
+			entityValue = entityData.get(i);
+			Entity entity = Entity.load(json, entityValue, gameModel);
+			gameModel.entity_list.add(entity);
+		}
+		
 
 		return gameModel;
 	}
