@@ -3,6 +3,12 @@ package com.left.addd.model;
 import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.StringBuilder;
@@ -23,7 +29,9 @@ public class GameModel {
 	public final int height;
 	private Time time;
 	
-	private Entity testEntity;
+	private List<Entity> entities;
+	
+	private List<StateChangedListener> listeners;
 
 	public GameModel(int width, int height) {
 		this(width, height, 0, true);
@@ -43,16 +51,20 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		this.testEntity = new Entity("testguy", tiles[0][1], tiles[2][12]);
+		this.entities = new ArrayList<Entity>();
+		Entity testEntity = new Entity("testentity", tiles[0][1], tiles[2][12]);
+		entities.add(testEntity);
 		testEntity.move(Direction.NORTH);
+		
+		this.listeners = new ArrayList<StateChangedListener>();
 	}
 	
 	public Time getTime() {
 		return time;
 	}
 	
-	public Entity getTestEntity() {
-		return testEntity;
+	public List<Entity> getEntities() {
+		return entities;
 	}
 
 	public Tile[][] getTiles() {
@@ -65,6 +77,11 @@ public class GameModel {
 			return Tile.dummyTile();
 		}
 		return tiles[x][y];
+	}
+	
+	public void addListener(StateChangedListener listener) {
+		this.listeners.add(listener);
+		listener.OnStateChanged();
 	}
 	
 	/**
@@ -126,7 +143,9 @@ public class GameModel {
 	}
 	
 	private void updateEntities(int ticks) {
-		testEntity.update(ticks);
+		for(Entity e : entities) {
+			e.update(ticks);
+		}
 	}
 	
 	public void save(Json json) {

@@ -3,6 +3,7 @@ package com.left.addd.view;
 import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
@@ -18,6 +19,9 @@ public class EntitySprite implements TileRenderable, StateChangedListener {
 
 	private final TextureAtlas atlas;
 	private final Entity entity;
+	
+	private static final Color plainColor = new Color(1, 1, 1, 1);
+	private static final Color highlightColor = new Color(0.7f, 1, 0.7f, 1);
 
 	// private final int FRAMES = 1;
 	private float time;
@@ -84,6 +88,18 @@ public class EntitySprite implements TileRenderable, StateChangedListener {
 	@Override
 	public float getHeight() {
 		return currentFrame.getRegionHeight();
+	}
+	
+	public Entity getEntity() {
+		return entity;
+	}
+	
+	public void select() {
+		currentImage.setColor(highlightColor);
+	}
+	
+	public void deselect() {
+		currentImage.setColor(plainColor);
 	}
 
 	@Override

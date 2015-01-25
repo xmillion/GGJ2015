@@ -1,8 +1,11 @@
 package com.left.addd.view;
 
 import static com.left.addd.utils.Log.log;
+import static com.left.addd.utils.Log.pCoords;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
@@ -14,6 +17,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.left.addd.AdddGame;
@@ -24,6 +28,8 @@ import com.left.addd.view.PannerDesktop;
 import com.left.addd.view.PannerMobile;
 import com.left.addd.model.Building;
 import com.left.addd.model.Direction;
+import com.left.addd.model.Entity;
+import com.left.addd.model.StateChangedListener;
 import com.left.addd.model.Tile;
 import com.left.addd.view.GameView;
 import com.left.addd.view.PannerAbstract;
@@ -33,11 +39,12 @@ import com.left.addd.view.TileImageType;
  * Manages the drawing of the model to the screen and player controls. Reference:
  * https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
-public class GameView implements InputProcessor {
+public class GameView implements InputProcessor, StateChangedListener {
 	public static final int TILE_LENGTH = 32;
 
 	private final AdddGame game;
 	private final GameModel gameModel;
+	private final TextureAtlas atlas;
 	protected OrthographicCamera viewCamera;
 
 	// Camera data
@@ -45,14 +52,19 @@ public class GameView implements InputProcessor {
 
 	// I/O data
 	private int buttonTouched;
-	private Vector3 touchPoint;
-	/** currentTileX and currentTileY are guaranteed to be within gameModel bounds */
-	private int currentTileX;
-	private int currentTileY;
+	private Vector2 hoverCoordinate;
 	/** hoverX and hoverY are guaranteed to be within gameModel bounds when isHovering == true */
 	private boolean isHovering;
 	private int hoverX;
 	private int hoverY;
+	private Vector2 clickCoordinate;
+	/** currentTileX and currentTileY are guaranteed to be within gameModel bounds */
+	private int clickX;
+	private int clickY;
+	private Vector2 rightClickCoordinate;
+	private int rightClickX;
+	private int rightClickY;
+
 	private Color hoverColor;
 
 	private static final Color queryColor = new Color(0.8f, 0.8f, 1, 1);
@@ -61,8 +73,8 @@ public class GameView implements InputProcessor {
 	private static final Color blankColor = new Color(1, 1, 1, 1);
 
 	// Tile rendering data
-	private EntitySprite testEntity;
-	
+	private List<EntitySprite> entitySprites;
+
 	// Assets
 	private final Map<TileImageType, Image> tileImageCache;
 	private final TileImageType[][] tileImageTypes;
@@ -74,6 +86,7 @@ public class GameView implements InputProcessor {
 	public GameView(AdddGame game, GameModel model, TextureAtlas atlas) {
 		this.game = game;
 		this.gameModel = model;
+		this.atlas = atlas;
 		this.viewCamera = new OrthographicCamera();
 
 		Vector3 pannerMin = new Vector3((-3) * TILE_LENGTH, (-3) * TILE_LENGTH, 0);
@@ -93,11 +106,13 @@ public class GameView implements InputProcessor {
 		}
 
 		buttonTouched = Buttons.LEFT;
-		touchPoint = new Vector3();
+		hoverCoordinate = new Vector2();
 		isHovering = false;
-		
-		testEntity = new EntitySprite(atlas, gameModel.getTestEntity());
-		
+		clickCoordinate = new Vector2();
+		rightClickCoordinate = new Vector2();
+
+		entitySprites = new ArrayList<EntitySprite>();
+
 		// Load all the tile images into cache
 		this.tileImageCache = new EnumMap<TileImageType, Image>(TileImageType.class);
 		for(TileImageType type: TileImageType.values()) {
@@ -128,14 +143,38 @@ public class GameView implements InputProcessor {
 	 * @param screenY Screen Y coordinate from bottom left
 	 * @return true if currentTileX and currentTileY have been adjusted.
 	 */
-	private boolean setCurrentTileFromScreen(float screenX, float screenY) {
+	private boolean setClickTileFromScreen(float screenX, float screenY) {
+		Vector3 touchPoint = new Vector3();
 		touchPoint.set(screenX, screenY, 0);
 		panner.unproject(touchPoint);
-		int x = (int) touchPoint.x / TILE_LENGTH;
-		int y = (int) touchPoint.y / TILE_LENGTH;
+		clickCoordinate.set(touchPoint.x / TILE_LENGTH, touchPoint.y / TILE_LENGTH);
+		int x = (int) clickCoordinate.x;
+		int y = (int) clickCoordinate.y;
 		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
-			currentTileX = x;
-			currentTileY = y;
+			clickX = x;
+			clickY = y;
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Calibrates currentTileX and currentTileY's values.
+	 * 
+	 * @param screenX Screen X coordinate from bottom left
+	 * @param screenY Screen Y coordinate from bottom left
+	 * @return true if currentTileX and currentTileY have been adjusted.
+	 */
+	private boolean setRightClickTileFromScreen(float screenX, float screenY) {
+		Vector3 touchPoint = new Vector3();
+		touchPoint.set(screenX, screenY, 0);
+		panner.unproject(touchPoint);
+		rightClickCoordinate.set(touchPoint.x / TILE_LENGTH, touchPoint.y / TILE_LENGTH);
+		int x = (int) rightClickCoordinate.x;
+		int y = (int) rightClickCoordinate.y;
+		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
+			rightClickX = x;
+			rightClickY = y;
 			return true;
 		}
 		return false;
@@ -149,10 +188,12 @@ public class GameView implements InputProcessor {
 	 * @return true if hoverX and hoverY have been adjusted.
 	 */
 	private boolean setHoverTileFromScreen(float screenX, float screenY) {
+		Vector3 touchPoint = new Vector3();
 		touchPoint.set(screenX, screenY, 0);
 		panner.unproject(touchPoint);
-		int x = (int) touchPoint.x / TILE_LENGTH;
-		int y = (int) touchPoint.y / TILE_LENGTH;
+		hoverCoordinate.set(touchPoint.x / TILE_LENGTH, touchPoint.y / TILE_LENGTH);
+		int x = (int) hoverCoordinate.x;
+		int y = (int) hoverCoordinate.y;
 		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
 			hoverX = x;
 			hoverY = y;
@@ -205,6 +246,8 @@ public class GameView implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		log("GameView", "touchDown " + pCoords(screenX, screenY) + " pointer=" + pointer
+				+ " button=" + button);
 		buttonTouched = button;
 		if(panner.touchDown(screenX, screenY, pointer, button)) {
 			// Panning
@@ -220,15 +263,41 @@ public class GameView implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		log("GameView", "touchUp " + pCoords(screenX, screenY) + " pointer=" + pointer + " button="
+				+ button);
 		if(panner.touchUp(screenX, screenY, pointer, button)) {
 			// Panning
 			return true;
 		}
 
+		if(button == Buttons.LEFT) {
+			// set the tile coordinates
+			if(setClickTileFromScreen(screenX, screenY)) {
+				// check if there is an entity on top
+				for(EntitySprite e: entitySprites) {
+					if (isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth(), e.getHeight())) {
+						// show information and actions for the entity
+						e.select();
+					}
+				}
+			}
+		} else if(button == Buttons.RIGHT) {
+			// set the tile coordinates
+			if (setRightClickTileFromScreen(screenX, screenY)) {
+				// check if there is an entity on top
+				for(EntitySprite e: entitySprites) {
+					if (isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth(), e.getHeight())) {
+						// deselect the entity
+						e.deselect();
+					}
+				}
+			}
+		}
+		
 		if(button == Buttons.RIGHT) {
 			// Deselect
 			return true;
-		} else if(setCurrentTileFromScreen(screenX, screenY)) {
+		} else if(setClickTileFromScreen(screenX, screenY)) {
 			// Interact with tile
 			touchTile();
 		}
@@ -271,7 +340,10 @@ public class GameView implements InputProcessor {
 		game.getSound().play(SoundList.CLICK);
 
 		// Update all appropriate tiles
-		updateTile(currentTileX, currentTileY);
+		updateTile(clickX, clickY);
+
+		// TODO insert tile clicking logic here. create functions for Tile and call them here.
+		// ie. tile.interact();
 	}
 
 	/**
@@ -279,6 +351,9 @@ public class GameView implements InputProcessor {
 	 */
 	private void hoverTile() {
 		hoverColor = queryColor;
+
+		// TODO insert tile hovering logic here. create functions for Tile and call them here.
+		// ie. this.showTileInfo(tile); show a popup next to the tile
 	}
 
 	/**
@@ -335,9 +410,9 @@ public class GameView implements InputProcessor {
 	// ********************
 	// **** Rendering *****
 	// ********************
-	
+
 	public void create() {
-		testEntity.create();
+		gameModel.addListener(this);
 	}
 
 	public void render(SpriteBatch batch, float delta) {
@@ -392,9 +467,11 @@ public class GameView implements InputProcessor {
 			}
 		}
 	}
-	
+
 	private void renderEntities(SpriteBatch batch, float delta) {
-		testEntity.getImageForRender(delta).draw(batch, 1f);
+		for (EntitySprite es : entitySprites) {
+			es.getImageForRender(delta).draw(batch, 1f);
+		}
 	}
 
 	public void resize(int width, int height) {
@@ -405,5 +482,23 @@ public class GameView implements InputProcessor {
 		viewCamera.viewportHeight = height;
 		viewCamera.position.set(0, 0, 0);
 		viewCamera.update();
+	}
+
+	public void OnStateChanged() {
+		log("GameView", "GameModel state changed");
+		final List<Entity> entities = gameModel.getEntities();
+		if(entities.size() != entitySprites.size()) {
+			// regenerate view
+			entitySprites.clear();
+			for(int i = 0; i < entities.size(); i++) {
+				EntitySprite entitySprite = new EntitySprite(atlas, entities.get(i));
+				entitySprite.create();
+				entitySprites.add(entitySprite);
+			}
+		}
+	}
+	
+	private static boolean isTargetInRect(float targetX, float targetY, float x, float y, float width, float height) {
+		return (targetX > x && targetY > y && targetX < x + width && targetY < y + height);
 	}
 }
