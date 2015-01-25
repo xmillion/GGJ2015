@@ -59,6 +59,10 @@ public class GameModel {
 		Entity testEntity2 = new Entity(tiles[2][0]);
 		testEntity.setTargetEntity(new Entity(new Tile(this,2,12)));
 		testEntity2.setTargetEntity(new Entity(new Tile(this,2,24)));
+		testEntity.addMetadata("Name", "Bob");
+		testEntity.addMetadata("Description", "Bob is the first test entity");
+		testEntity2.addMetadata("Name", "Alice");
+		testEntity2.addMetadata("Description", "Alice is the second test entity");
 		entities.add(testEntity);
 		entities.add(testEntity2);
 		
