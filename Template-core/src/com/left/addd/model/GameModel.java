@@ -112,6 +112,11 @@ public class GameModel {
 		em.addEntity(testEntity);
 		em.addEntity(testEntity2);
 		em.addEntity(testEntity3);
+		em.addEntity(testEntity4);
+		em.addEntity(testEntity5);
+		em.addEntity(testEntity6);
+		em.addEntity(testBuilding);
+		em.addEntity(testBuilding);
 		testEntity.move(Direction.NORTH);
 		testEntity.setTargetEntity(testEntity2);
 		
