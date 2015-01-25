@@ -38,7 +38,7 @@ public class Entity {
 		this.currentTile = currentTile;
 		this.nextTile = currentTile;
 
-		this.moveDuration = 3;
+		this.moveDuration = 1;
 		this.moveProgress = 0;
 		this.listeners = new ArrayList<StateChangedListener>(1);
 		

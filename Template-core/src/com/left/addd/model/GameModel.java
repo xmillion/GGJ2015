@@ -48,20 +48,31 @@ public class GameModel {
 		
 		this.time = new Time(timeInHours);
 		
-		Entity testEntity = new Entity(tiles[2][1]);
-		Entity testEntity2 = new Entity(tiles[5][4]);
-		Entity testEntity3 = new Entity(tiles[10][10]);
+		Building testBuilding = new Building(BuildingType.HOUSE, tiles[5][1]);
+		testBuilding.addMetadata("Name", "Hotel");
+		testBuilding.addMetadata("Description", "This is where Alice and Chad go when they get it on");
+		
+		Building testBuilding2 = new Building(BuildingType.FACTORY, tiles[4][10]);
+		testBuilding2.addMetadata("Name", "Bob's Workplace");
+		testBuilding2.addMetadata("Description", "This is where Bob works while Alice cheats on him");
+		
+		Hero testEntity = new Hero(HeroType.ARTIST, tiles[2][1]);
+		Hero testEntity2 = new Hero(HeroType.ENGINEER, tiles[1][4]);
+		NPC testEntity3 = new NPC(NPCType.POLICE, tiles[10][10]);
 		testEntity.addMetadata("Name", "Alice");
 		testEntity.addMetadata("Description", "Alice is a homewrecker and gets with Bob and Chad");
 		
 		testEntity.addObjective(testEntity2, testEntity3);
-		testEntity.addObjective(testEntity3, testEntity2);
+		testEntity.addObjective(testEntity3, testBuilding);
+		testEntity2.addObjective(testEntity, testBuilding2);
 		
 		testEntity2.addMetadata("Name", "Bob");
 		testEntity2.addMetadata("Description", "Bob is a hardworking family man");
 		
 		testEntity3.addMetadata("Name", "Chad");
 		testEntity3.addMetadata("Description", "Fucking Chad");
+		
+		testEntity3.addObjective(testEntity,  testBuilding);
 		
 		em.addEntity(testEntity);
 		em.addEntity(testEntity2);
