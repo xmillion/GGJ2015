@@ -29,11 +29,6 @@ public class Entity {
 	 */
 	private final HashMap<String,Object> mMetadata;
 	
-	/*
-	 * Current state of the entity and its actions
-	 */
-	private EntityState mCurrentState;
-	
 	private HashMap<Entity,Entity> mObjectives;
 	
 	private Entity mTargetEntity;
@@ -260,14 +255,6 @@ public class Entity {
 		}
 	}
 	
-	public void setCurrentState(EntityState es) {
-		mCurrentState = es;
-	}
-	
-	public EntityState getCurrentState() {
-		return mCurrentState;
-	}
-	
 	public Entity getTargetEntity() {
 		return mTargetEntity;
 	}
@@ -288,50 +275,4 @@ public class Entity {
 		return mMetadata;
 	}
 	
-
-	/**
-	 * Private class to keep track of the states of the entity
-	 * @author kev
-	 *
-	 */
-	public class EntityState {
-		
-		private int mX;
-		private int mY;
-		private Tile mNextTile;
-		
-		public EntityState() {
-			mX = 0;
-			mY = 0;
-		}
-		
-		public EntityState(int x, int y) {
-			mX = x;
-			mY = y;
-		}
-		
-		public void setX(int x) {
-			mX = x;
-		}
-		
-		public int getX() {
-			return mX;
-		}
-		
-		public void setY(int y) {
-			mY = y;
-		}
-		
-		public int getY() {
-			return mY;
-		}
-		
-		public void setNextTile(Tile next) {
-			mNextTile = next;
-		}
-		
-		public Tile getNextTile() {
-			return mNextTile;
-		}
-	}
 }

@@ -42,11 +42,11 @@ public class EntityManager {
 	}
 	
 	private static boolean checkAdjacency(Entity e1, Entity e2) {
-		int e1_x = e1.getCurrentState().getX();
-		int e1_y = e1.getCurrentState().getY();
+		int e1_x = e1.getCurrentTile().x;
+		int e1_y = e1.getCurrentTile().y;
 		
-		int e2_x = e2.getCurrentState().getX();
-		int e2_y = e2.getCurrentState().getY();
+		int e2_x = e2.getCurrentTile().x;
+		int e2_y = e2.getCurrentTile().y;
 		
 		if ((e1_x + 1 == e2_x || e1_x - 1 == e2_x || e1_x == e2_x) &&
 			(e1_y + 1 == e2_y || e1_y - 1 == e2_y || e1_y == e2_y)) {
