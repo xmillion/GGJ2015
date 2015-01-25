@@ -3,6 +3,8 @@ package com.left.addd.view;
 import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
+import com.left.addd.model.*;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import com.left.addd.view.PannerMobile;
 import com.left.addd.model.Building;
 import com.left.addd.model.Direction;
 import com.left.addd.model.Entity;
+import com.left.addd.model.Network;
 import com.left.addd.model.StateChangedListener;
 import com.left.addd.model.Tile;
 import com.left.addd.view.GameView;
@@ -372,13 +375,15 @@ public class GameView implements InputProcessor, StateChangedListener {
 		Tile tile = gameModel.getTile(x, y);
 		if(tile.hasNetwork()) {
 			// Update tile and NESW neighbours
+			tile.clearNetwork();
+			setTileImageType(tile);
+		} else {
+			tile.setNetwork(new Network(NetworkType.ROAD));
 			setTileImageType(tile);
 			setTileImageType(tile.getNeighbour(Direction.NORTH));
 			setTileImageType(tile.getNeighbour(Direction.EAST));
 			setTileImageType(tile.getNeighbour(Direction.SOUTH));
 			setTileImageType(tile.getNeighbour(Direction.WEST));
-		} else {
-			setTileImageType(tile);
 		}
 	}
 
