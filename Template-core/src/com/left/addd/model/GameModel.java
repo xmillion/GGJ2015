@@ -49,7 +49,7 @@ public class GameModel {
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,0,1,0,0,0,1,0,0,0,0,0},
 					{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
-					{1,1,1,1,1,0,0,0,1,0,0,0,1,0,0},
+					{1,1,1,1,1,0,0,0,0,0,0,0,1,0,0},
 					{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0},
 					{1,0,0,0,1,0,0,0,0,0,0,1,1,0,0},
 					{1,0,0,0,1,1,1,1,1,1,1,1,1,0,0},
@@ -116,7 +116,7 @@ public class GameModel {
 		em.addEntity(testEntity5);
 		em.addEntity(testEntity6);
 		em.addEntity(testBuilding);
-		em.addEntity(testBuilding);
+		em.addEntity(testBuilding2);
 		testEntity.move(Direction.NORTH);
 		testEntity.setTargetEntity(testEntity2);
 		
