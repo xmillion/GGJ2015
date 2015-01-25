@@ -1,6 +1,5 @@
 package com.left.addd.view;
 
-import com.left.addd.model.Building;
 import com.left.addd.model.Direction;
 import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
@@ -31,9 +30,7 @@ public enum TileImageType {
 	ROAD_TE("road-te"),
 	ROAD_TS("road-ts"),
 	ROAD_TW("road-tw"),
-	ROAD_X("road-x"),
-	HOUSE("house"),
-	FACTORY("factory");
+	ROAD_X("road-x");
 	
 	private final String fileName;
 	private TileImageType(String fileName) {
@@ -48,21 +45,7 @@ public enum TileImageType {
 	 * @param tile legitimate tile
 	 */
 	public static TileImageType getImageFromTile(Tile tile) {
-		if(tile.hasBuilding()) {
-			Building b = tile.getBuilding();
-			if(tile.x == b.getOriginX() && tile.y == b.getOriginY()) {
-				switch(b.type) {
-				case HOUSE:
-					return TileImageType.HOUSE;
-				case FACTORY:
-					return TileImageType.FACTORY;
-				default:
-					return TileImageType.NONE;
-				}
-			} else {
-				return TileImageType.NONE;
-			}
-		} else if(tile.hasNetwork()) {
+		if(tile.hasNetwork()) {
 			Network network = tile.getNetwork();
 			// Check neighbours
 			boolean n = network.getNeighbour(Direction.NORTH) != null;

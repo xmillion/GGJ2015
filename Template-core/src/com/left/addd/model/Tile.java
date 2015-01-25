@@ -15,7 +15,6 @@ public class Tile {
 	public final int x;
 	public final int y;
 
-	private Building building;
 	private Network network;
 
 	public Tile(GameModel gameModel) {
@@ -80,10 +79,6 @@ public class Tile {
 		return this.network != null;
 	}
 	
-	public boolean hasBuilding(){
-		return false;
-	}
-
 	public Tile getNeighbour(Direction dir) {
 		switch(dir) {
 		case NORTH:

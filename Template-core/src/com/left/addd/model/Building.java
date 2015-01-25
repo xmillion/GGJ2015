@@ -11,7 +11,7 @@ public class Building extends Entity{
 	public final BuildingType type;
 
 	public Building(String name, BuildingType type, Tile currentTile) {
-		super(name, currentTile );
+		super(name, currentTile);
 		setOrigin(currentTile.x, currentTile.y);
 		this.type = type;
 	}

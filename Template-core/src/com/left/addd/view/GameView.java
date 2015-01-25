@@ -246,25 +246,18 @@ public class GameView implements InputProcessor, StateChangedListener {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		log("GameView", "touchDown " + pCoords(screenX, screenY) + " pointer=" + pointer
-				+ " button=" + button);
+		//log("GameView", "touchDown " + pCoords(screenX, screenY) + " pointer=" + pointer + " button=" + button);
 		buttonTouched = button;
 		if(panner.touchDown(screenX, screenY, pointer, button)) {
 			// Panning
 			return true;
 		}
-		// TODO click hit detection. Do this on touchDown or touchUp?
-		// 1. Find the intent of the user... selecting a character or a tile?
-		// 2. Find the target (character, or the tile underneath)
-		// 3. Call the appropriate view classes to handle the selection
-
 		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		log("GameView", "touchUp " + pCoords(screenX, screenY) + " pointer=" + pointer + " button="
-				+ button);
+		//log("GameView", "touchUp " + pCoords(screenX, screenY) + " pointer=" + pointer + " button=" + button);
 		if(panner.touchUp(screenX, screenY, pointer, button)) {
 			// Panning
 			return true;
@@ -274,22 +267,23 @@ public class GameView implements InputProcessor, StateChangedListener {
 			// set the tile coordinates
 			if(setClickTileFromScreen(screenX, screenY)) {
 				// check if there is an entity on top
+				boolean targetFound = false;
 				for(EntitySprite e: entitySprites) {
-					if (isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth(), e.getHeight())) {
+					if (!targetFound && isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth(), e.getHeight())) {
 						// show information and actions for the entity
 						e.select();
+						targetFound = true;
+					} else {
+						e.deselect();
 					}
 				}
 			}
 		} else if(button == Buttons.RIGHT) {
 			// set the tile coordinates
 			if (setRightClickTileFromScreen(screenX, screenY)) {
-				// check if there is an entity on top
+				// deselect all entities
 				for(EntitySprite e: entitySprites) {
-					if (isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth(), e.getHeight())) {
-						// deselect the entity
-						e.deselect();
-					}
+					e.deselect();
 				}
 			}
 		}
@@ -370,14 +364,6 @@ public class GameView implements InputProcessor, StateChangedListener {
 			setTileImageType(tile.getNeighbour(Direction.EAST));
 			setTileImageType(tile.getNeighbour(Direction.SOUTH));
 			setTileImageType(tile.getNeighbour(Direction.WEST));
-		} else if(tile.hasBuilding()) {
-			// Update entire building
-			Building b = tile.getBuilding();
-			for(int i = 0; i < b.getWidth(); i++) {
-				for(int j = 0; j < b.getHeight(); j++) {
-					setTileImageType(gameModel.getTile(b.getOriginX() + i, b.getOriginY() + j));
-				}
-			}
 		} else {
 			setTileImageType(tile);
 		}
@@ -447,17 +433,8 @@ public class GameView implements InputProcessor, StateChangedListener {
 		if(isHovering) {
 			Image image;
 			Tile tile = gameModel.getTile(hoverX, hoverY);
-			int x, y;
-
-			if(tile.hasBuilding()) {
-				Building b = tile.getBuilding();
-				x = b.getOriginX();
-				y = b.getOriginY();
-			} else {
-				x = tile.x;
-				y = tile.y;
-			}
-
+			int x = tile.x;
+			int y = tile.y;
 			image = tileImageCache.get(tileImageTypes[x][y]);
 			if(image != null) {
 				image.setPosition(x * GameView.TILE_LENGTH, y * GameView.TILE_LENGTH);
@@ -499,6 +476,6 @@ public class GameView implements InputProcessor, StateChangedListener {
 	}
 	
 	private static boolean isTargetInRect(float targetX, float targetY, float x, float y, float width, float height) {
-		return (targetX > x && targetY > y && targetX < x + width && targetY < y + height);
+		return (targetX >= x && targetY >= y && targetX < x + width && targetY < y + height);
 	}
 }

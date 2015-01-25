@@ -4,20 +4,14 @@ import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.StringBuilder;
-import com.left.addd.model.Building;
 import com.left.addd.model.GameModel;
 import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
-import java.util.ArrayList;
 
 /**
  * TemplateModel is the model for this game. It represents the logic behind this game.
