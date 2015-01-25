@@ -5,8 +5,10 @@ import static com.left.addd.utils.Log.pCoords;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -14,6 +16,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -65,6 +68,9 @@ public class GameView implements InputProcessor, StateChangedListener {
 	private int rightClickX;
 	private int rightClickY;
 
+	private Vector3 tooltip;
+	private Entity tooltipEntity;
+
 	private Color hoverColor;
 
 	private static final Color queryColor = new Color(0.8f, 0.8f, 1, 1);
@@ -110,6 +116,8 @@ public class GameView implements InputProcessor, StateChangedListener {
 		isHovering = false;
 		clickCoordinate = new Vector2();
 		rightClickCoordinate = new Vector2();
+		tooltip = new Vector3();
+		tooltipEntity = null;
 
 		entitySprites = new ArrayList<EntitySprite>();
 
@@ -138,7 +146,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 
 	/**
 	 * Calibrates currentTileX and currentTileY's values.
-	 * 
+	 *
 	 * @param screenX Screen X coordinate from bottom left
 	 * @param screenY Screen Y coordinate from bottom left
 	 * @return true if currentTileX and currentTileY have been adjusted.
@@ -157,10 +165,10 @@ public class GameView implements InputProcessor, StateChangedListener {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Calibrates currentTileX and currentTileY's values.
-	 * 
+	 *
 	 * @param screenX Screen X coordinate from bottom left
 	 * @param screenY Screen Y coordinate from bottom left
 	 * @return true if currentTileX and currentTileY have been adjusted.
@@ -182,7 +190,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 
 	/**
 	 * Calibrates hoverX and hoverY values.
-	 * 
+	 *
 	 * @param screenX Screen X coordinate from bottom left
 	 * @param screenY Screen Y coordinate from bottom left
 	 * @return true if hoverX and hoverY have been adjusted.
@@ -288,7 +296,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 				}
 			}
 		}
-		
+
 		if(button == Buttons.RIGHT) {
 			// Deselect
 			return true;
@@ -316,6 +324,10 @@ public class GameView implements InputProcessor, StateChangedListener {
 		if(isHovering) {
 			hoverTile();
 		}
+
+		tooltip.set(screenX, screenY, 0);
+		panner.unproject(tooltip);
+
 		return true;
 	}
 
@@ -353,7 +365,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 
 	/**
 	 * Call this to update the Tile View for the given Tile coordinate. Note: only tile.x and tile.y are used.
-	 * 
+	 *
 	 * @param tile Coordinate of Tile to update.
 	 */
 	private void updateTile(int x, int y) {
@@ -383,7 +395,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 
 	/**
 	 * Updates the TileImageType for the given Tile coordinate.
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 */
@@ -411,6 +423,7 @@ public class GameView implements InputProcessor, StateChangedListener {
 		renderTiles(batch, delta);
 		renderHover(batch, delta);
 		renderEntities(batch, delta);
+		renderTooltip(batch);
 		batch.end();
 
 		panner.render(delta);
@@ -452,6 +465,31 @@ public class GameView implements InputProcessor, StateChangedListener {
 		}
 	}
 
+	private void renderTooltip(SpriteBatch batch) {
+		BitmapFont font = new BitmapFont();
+		font.setColor(Color.GREEN);
+		float tooltipOffset = 10;
+		float lineHeight = 32;
+		Entity te = null;
+		for (EntitySprite es: entitySprites) {
+			System.out.println("es "+es.getX()*TILE_LENGTH+","+es.getY()*TILE_LENGTH+" "+es.getWidth()+"x"+es.getHeight());
+			if((es.getX()*TILE_LENGTH < tooltip.x && (es.getX()*TILE_LENGTH + es.getWidth()) > tooltip.x) &&
+			   (es.getY()*TILE_LENGTH < tooltip.y && (es.getY()*TILE_LENGTH + es.getHeight()) > tooltip.y)) {
+				te = es.getEntity();
+				break;
+			}
+		}
+		if (te != null) {
+			Set<String> keys = te.getMetadata().keySet();
+			int lineCount = 0;
+			for (String s : keys) {
+				String metadata = s + ": "+te.getMetadata().get(s).toString();
+				font.draw(batch, metadata , tooltip.x+tooltipOffset, tooltip.y+tooltipOffset+lineHeight*lineCount);
+				lineCount++;
+			}
+		}
+	}
+
 	public void resize(int width, int height) {
 		panner.resize(width, height);
 
@@ -475,10 +513,10 @@ public class GameView implements InputProcessor, StateChangedListener {
 			}
 		}
 	}
-	
+
 	private static boolean isTargetInRect(float targetX, float targetY, float x, float y, float width, float height) {
 		log ("Target " + pCoords(targetX, targetY) + " Rect " + pCoords(x, y) + " " + pCoords(x+width, y+height));
-		
+
 		return (targetX >= x && targetY >= y && targetX < x + width && targetY < y + height);
 	}
 }

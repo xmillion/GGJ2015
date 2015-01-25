@@ -252,6 +252,14 @@ public class Entity {
 		return mObjectives;
 	}
 	
+	public void addMetadata(String key, Object value) {
+		mMetadata.put(key, value);
+	}
+	
+	public HashMap<String,Object> getMetadata() {
+		return mMetadata;
+	}
+	
 
 	/**
 	 * Private class to keep track of the states of the entity

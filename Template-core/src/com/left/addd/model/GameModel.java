@@ -51,6 +51,10 @@ public class GameModel {
 		this.entities = new ArrayList<Entity>();
 		Entity testEntity = new Entity(tiles[0][1]);
 		Entity testEntity2 = new Entity(tiles[0][2]);
+		testEntity.addMetadata("Name", "Bob");
+		testEntity.addMetadata("Description", "Bob is the first test entity");
+		testEntity2.addMetadata("Name", "Alice");
+		testEntity2.addMetadata("Description", "Alice is the second test entity");
 		entities.add(testEntity);
 		entities.add(testEntity2);
 		testEntity.move(Direction.NORTH);
