@@ -3,8 +3,10 @@ package com.left.addd.model;
 import static com.left.addd.utils.Log.log;
 import static com.left.addd.utils.Log.pCoords;
 
+import java.util.PriorityQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.List;
 
 import com.badlogic.gdx.utils.Json;
@@ -144,6 +146,74 @@ public class Entity {
 		json.writeValue("type", this.type.name());
 		json.writeObjectEnd();
 		*/
+	}
+	
+	private void findPathToTarget() {
+		int stepsTaken = 0;
+		Boolean success = false;
+		Tile targetTile = mTargetEntity.currentTile;
+		Node currNode = new Node(currentTile, targetTile, 0,null);
+		PriorityQueue<Node> searchList = new PriorityQueue<Node>();
+		HashMap<Tile, Node> visitedNodes = new HashMap<Tile, Node>();
+		searchList.add(new Node(currentTile, targetTile, stepsTaken, null));
+		while(searchList.size()>0){
+			currNode = searchList.poll();
+			if (currNode.tile == targetTile) {
+				success = true;
+				break;
+			}
+			int newStepsTaken = currNode.stepsTaken + 1;
+			for( Tile tile : currNode.tile.getNeighbours()) {
+				if(visitedNodes.get(tile) != null){
+					visitedNodes.get(tile).updateNode(newStepsTaken, currNode);
+				} else {
+					searchList.add(new Node(currNode.tile, targetTile, newStepsTaken, currNode));
+				}
+			}
+			
+		}
+		if (success) {
+			while (currNode.previous != null) {
+				currNode = currNode.previous;
+			}
+			this.nextTile = currNode.tile;
+		} else {
+			this.nextTile = this.currentTile;
+		}
+		
+	}
+	
+	private class Node implements Comparable<Node> {
+		public final Tile tile;
+		int stepsTaken;
+		double value;
+		Node previous;
+		public Node(Tile startTile, Tile endTile, int stepsTaken, Node previous){
+			this.tile = startTile;
+			this.stepsTaken = stepsTaken;
+			this.previous = previous;
+			this.value = Math.sqrt(Math.pow(startTile.x - endTile.x, 2) + Math.pow(startTile.y - endTile.y, 2));
+		}
+		
+		void updateNode(int stepsTaken, Node previous){
+			if (stepsTaken < this.stepsTaken) {
+				this.stepsTaken = stepsTaken;
+				this.previous = previous;
+			}
+		}
+		
+		int getStepsTaken() {
+			return this.stepsTaken;
+		}
+		
+		double getValue() {
+			return this.stepsTaken + this.value;
+		}
+		
+		@Override
+		public int compareTo(Node other){
+			return (this.getValue() < other.getValue()) ? -1 : 1;
+		}
 	}
 
 	/**

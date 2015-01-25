@@ -3,6 +3,7 @@ package com.left.addd.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.left.addd.utils.Utils;
+import java.util.ArrayList;
 
 /**
  * This class is the representation of a discrete unit in a Grid.
@@ -99,6 +100,29 @@ public class Tile {
 		Tile t = getNeighbour(dir);
 		return Tile.isDummyTile(t) ? defaultTile : t;
 	}
+	
+	public Tile[] getNeighbours() {
+        ArrayList<Tile> Available = new ArrayList<Tile>();
+        for (Direction dir : Direction.values()) {
+            if (checkForNetwork(dir)) {
+                Available.add(getNeighbour(dir));
+            }
+        }
+        return (Tile[]) Available.toArray();
+    }
+    
+    
+    private boolean checkForNetwork(Direction dir) {
+        if (!this.equals(getNeighbour(dir))) {
+            if (getNeighbour(dir).getNetwork().type == NetworkType.ROAD) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
 	// *** Rules ***
 
