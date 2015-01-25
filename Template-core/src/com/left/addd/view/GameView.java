@@ -269,8 +269,9 @@ public class GameView implements InputProcessor, StateChangedListener {
 				// check if there is an entity on top
 				boolean targetFound = false;
 				for(EntitySprite e: entitySprites) {
-					if (!targetFound && isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth(), e.getHeight())) {
+					if (!targetFound && isTargetInRect(clickCoordinate.x, clickCoordinate.y, e.getX(), e.getY(), e.getWidth() / TILE_LENGTH, e.getHeight() / TILE_LENGTH)) {
 						// show information and actions for the entity
+						log("Target found " + pCoords(e.getX(), e.getY()));
 						e.select();
 						targetFound = true;
 					} else {
@@ -476,6 +477,8 @@ public class GameView implements InputProcessor, StateChangedListener {
 	}
 	
 	private static boolean isTargetInRect(float targetX, float targetY, float x, float y, float width, float height) {
+		log ("Target " + pCoords(targetX, targetY) + " Rect " + pCoords(x, y) + " " + pCoords(x+width, y+height));
+		
 		return (targetX >= x && targetY >= y && targetX < x + width && targetY < y + height);
 	}
 }

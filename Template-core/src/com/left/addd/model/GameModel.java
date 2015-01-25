@@ -107,16 +107,6 @@ public class GameModel {
 
 		// Tile data
 		query.append("Tile " + pCoords(tile.x, tile.y));
-
-		// Building data
-		/*if(tile.hasBuilding()) {
-			Building b = tile.getBuilding();
-			query.append("Building: " + b.type.name());
-			query.append(" Origin=" + pCoords(b.getOriginX(), b.getOriginY()));
-			query.append(" Size=" + b.getWidth() + "x" + b.getHeight());
-		} else {
-			query.append("No building");
-		}*/
 		query.append(".\n");
 
 		// Network data
