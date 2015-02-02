@@ -29,7 +29,7 @@ public class GameSerializer {
 			@SuppressWarnings("rawtypes")
 			@Override
 			public GameModel read(Json json, JsonValue jsonData, Class type) {
-				return GameModel.load(json, jsonData);
+				return GameModel.load(jsonData);
 			}
 		});
 	}

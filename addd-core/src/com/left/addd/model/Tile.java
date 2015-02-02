@@ -110,7 +110,37 @@ public class Tile {
         }
         return Available;
     }
-    
+	
+	public Direction getDirection(Tile neighbour) {
+		if (this.equals(neighbour)) {
+			return null;
+		}
+		int deltaX = neighbour.x - this.x;
+		int deltaY = neighbour.y - this.y;
+		if (deltaX > deltaY) {
+			// south or east
+			if (deltaX < 0) {
+				return Direction.SOUTH;
+			}
+		} else {
+			// north or west
+		}
+		
+		
+		if (deltaX > 0) {
+			if (deltaY > deltaX) {
+				return Direction.NORTH;
+			} else {
+				return Direction.EAST;
+			}
+		} else {
+			if (deltaY > deltaX) {
+				return Direction.NORTH;
+			} else {
+				return Direction.WEST;
+			}
+		}
+	}
     
     private boolean checkForNetwork(Direction dir) {
         if (!this.equals(getNeighbour(dir))) {
@@ -160,7 +190,7 @@ public class Tile {
 	 * @param data
 	 * @return
 	 */
-	public static Tile load(Json json, JsonValue jsonData, GameModel gameModel) {
+	public static Tile load(JsonValue jsonData, GameModel gameModel) {
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
 
@@ -169,7 +199,7 @@ public class Tile {
 		if(networkData != null) {
 			// Can only load tiles[x][y-1] and tiles[x-1][y]
 			// because the next ones haven't been initialized yet.
-			network = Network.load(json, networkData, gameModel.getTile(x, y - 1).getNetwork(),
+			network = Network.load(networkData, gameModel.getTile(x, y - 1).getNetwork(),
 					gameModel.getTile(x - 1, y).getNetwork());
 		}
 

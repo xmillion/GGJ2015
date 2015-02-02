@@ -10,12 +10,21 @@ public class Res {
 	// In game assets
 	public static final String TILES = "tiles/";
 	public static final String ENTITIES = "entities/";
-	public static final int TILE_LENGTH = 32;
-	public static final int ENTITY_LENGTH = 32;
+	public static final int TILE_WIDTH = 32;
+	public static final int TILE_HEIGHT = 32;
+	public static final int ENTITY_WIDTH = 32;
+	public static final int ENTITY_HEIGHT = 32;
 	
 	// UI Image Atlas
 	public static final String BUILD = "ui/build/";
 	public static final String TIME = "ui/";
 	public static final String PAN = "ui/";
 	public static final String PAUSE = "ui/";
+	
+	
+	// ID Generator
+	private static long id = System.currentTimeMillis();
+	public static long generateId() {
+		return id++;
+	}
 }

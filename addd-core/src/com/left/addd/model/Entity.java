@@ -10,36 +10,44 @@ import java.util.List;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.left.addd.utils.Res;
 
 public class Entity {
 
+	public final long id;
 	protected Tile currentTile;
+	/** @deprecated */
 	private Tile nextTile;
 
-	/** Number of ticks to move to an adjacent tile */
+	/** @deprecated Number of ticks to move to an adjacent tile */
 	private int moveDuration;
+	/** @deprecated */
 	private int moveProgress;
-
-	// this is willis's 11am event handling implementation
-	private List<StateChangedListener<Entity>> listeners;
+	/** @deprecated */
+	private List<MoveStateListener<Entity>> listeners;
 	
 	/**
+	 * @deprecated
 	 * Metadata of the entity (used to store strings, sprite dimension info etc)
 	 */
 	private final HashMap<String,Object> mMetadata;
-	
+	/** @deprecated */
 	private HashMap<Entity,Entity> mObjectives;
-	
+	/** @deprecated */
 	private Entity mTargetEntity;
 
-	public Entity(Tile currentTile) {
-		
-		this.currentTile = currentTile;
-		this.nextTile = currentTile;
+	public Entity(Tile tile) {
+		this(Res.generateId(), tile);
+	}
+	
+	protected Entity(long id, Tile tile) {
+		this.id = id;
+		this.currentTile = tile;
+		this.nextTile = tile;
 
 		this.moveDuration = 1;
 		this.moveProgress = 0;
-		this.listeners = new ArrayList<StateChangedListener<Entity>>(1);
+		this.listeners = new ArrayList<MoveStateListener<Entity>>(1);
 		
 		mMetadata = new HashMap<String,Object>();
 		mObjectives = new HashMap<Entity,Entity>();
@@ -65,11 +73,11 @@ public class Entity {
 		stateChanged();
 	}
 
-	public int getMoveDuration() {
+	public int getMoveRate() {
 		return moveDuration;
 	}
 
-	public void setMoveDuration(int speed) {
+	public void setMoveRate(int speed) {
 		this.moveDuration = speed;
 	}
 
@@ -77,7 +85,7 @@ public class Entity {
 		return moveProgress;
 	}
 
-	public void addStateChangedListener(StateChangedListener<Entity> listener) {
+	public void addStateChangedListener(MoveStateListener<Entity> listener) {
 		if (!listeners.contains(listener)) {
 			this.listeners.add(listener);
 			listener.OnStateChanged(this);
@@ -141,26 +149,9 @@ public class Entity {
 	}
 
 	private void stateChanged() {
-		for(StateChangedListener<Entity> l : listeners) {
+		for(MoveStateListener<Entity> l : listeners) {
 			l.OnStateChanged(this);
 		}
-	}
-
-	// *** Serialization ***
-
-	/**
-	 * Serialize a Tile into json.
-	 *
-	 * @param json Json serializer, which will now have the tile's data.
-	 * @param tile Tile to save
-	 */
-	public void save(Json json) {
-		json.writeObjectStart("entity");
-		json.writeValue("x", currentTile.x);
-		json.writeValue("y", currentTile.y);
-		json.writeValue("entity_type", "entity");
-		// TODO save metadata
-		json.writeObjectEnd();
 	}
 	
 	private void findPathToTarget() {
@@ -236,25 +227,6 @@ public class Entity {
 			return (this.getValue() < other.getValue()) ? -1 : 1;
 		}
 	}
-
-	/**
-	 * Create a Tile using a json string.
-	 *
-	 * @param data
-	 * @return
-	 */
-	public static Entity load(Json json, JsonValue jsonData, GameModel gameModel) {
-		//EntityType type = EntityType.valueOf(jsonData.getString("entity_type"));
-		// TODO load metadata
-		//if (type==EntityType.BUILDING){
-		//	Entity building = Building.load(json, jsonData, gameModel);
-		//	return building;
-		//} else {
-			int x = jsonData.getInt("x");
-			int y = jsonData.getInt("y");
-			return new Entity(gameModel.getTile(x, y));
-		//}
-	}
 	
 	public Entity getTargetEntity() {
 		return mTargetEntity;
@@ -280,4 +252,39 @@ public class Entity {
 		return mMetadata;
 	}
 	
+	// *** Serialization ***
+
+	/**
+	 * Serialize a Tile into json.
+	 *
+	 * @param json Json serializer, which will now have the tile's data.
+	 * @param tile Tile to save
+	 */
+	public void save(Json json) {
+		json.writeObjectStart("entity");
+		json.writeValue("x", currentTile.x);
+		json.writeValue("y", currentTile.y);
+		json.writeValue("entity_type", "entity");
+		// TODO save metadata
+		json.writeObjectEnd();
+	}
+	
+	/**
+	 * Create a Tile using a json string.
+	 *
+	 * @param data
+	 * @return
+	 */
+	public static Entity load(JsonValue jsonData, GameModel gameModel) {
+		//EntityType type = EntityType.valueOf(jsonData.getString("entity_type"));
+		// TODO load metadata
+		//if (type==EntityType.BUILDING){
+		//	Entity building = Building.load(json, jsonData, gameModel);
+		//	return building;
+		//} else {
+			int x = jsonData.getInt("x");
+			int y = jsonData.getInt("y");
+			return new Entity(gameModel.getTile(x, y));
+		//}
+	}
 }

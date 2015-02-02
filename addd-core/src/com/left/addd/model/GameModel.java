@@ -13,10 +13,9 @@ import com.left.addd.model.GameModel;
 import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
-import com.left.addd.services.EntityManager;
 
 /**
- * TemplateModel is the model for this game. It represents the logic behind this game.
+ * GameModel is the model for this game. It represents the logic behind this game.
  * It does not know anything about how the representation is drawn, or how the player interacts with it.
  * Reference: https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
@@ -26,9 +25,9 @@ public class GameModel {
 	public final int height;
 	private Time time;
 	
-	private List<StateChangedListener<GameModel>> listeners;
+	private List<MoveStateListener<GameModel>> listeners;
 	
-	EntityManager em = EntityManager.getInstance();
+	EntityManager em = new EntityManager();
 
 	public GameModel(int width, int height) {
 		this(width, height, 0, true);
@@ -144,7 +143,7 @@ public class GameModel {
 		em.addEntity(testEntity8);
 		testEntity.move(Direction.NORTH);
 		
-		this.listeners = new ArrayList<StateChangedListener<GameModel>>();
+		this.listeners = new ArrayList<MoveStateListener<GameModel>>();
 	}
 	
 	public Tile getTileByEntityProperty(){
@@ -171,7 +170,7 @@ public class GameModel {
 		return tiles[x][y];
 	}
 	
-	public void addListener(StateChangedListener<GameModel> listener) {
+	public void addListener(MoveStateListener<GameModel> listener) {
 		this.listeners.add(listener);
 		listener.OnStateChanged(this);
 	}
@@ -246,7 +245,7 @@ public class GameModel {
 		json.writeObjectEnd();
 	}
 
-	public static GameModel load(Json json, JsonValue jsonData) {
+	public static GameModel load(JsonValue jsonData) {
 		int width = jsonData.getInt("width");
 		int height = jsonData.getInt("height");
 		long timeInHours = jsonData.getLong("time");
@@ -257,7 +256,7 @@ public class GameModel {
 		JsonValue tileValue;
 		for(int i = 0; i < tileData.size; i++) {
 			tileValue = tileData.get(i);
-			Tile tile = Tile.load(json, tileValue, gameModel);
+			Tile tile = Tile.load(tileValue, gameModel);
 			gameModel.tiles[tile.x][tile.y] = tile;
 		}
 		
@@ -265,7 +264,7 @@ public class GameModel {
 		JsonValue entityValue;
 		for(int i = 0; i < entityData.size; i++) {
 			entityValue = entityData.get(i);
-			Entity entity = Entity.load(json, entityValue, gameModel);
+			Entity entity = Entity.load(entityValue, gameModel);
 			gameModel.em.addEntity(entity);
 		}
 		

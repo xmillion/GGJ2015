@@ -26,13 +26,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.left.addd.AdddGame;
 import com.left.addd.model.GameModel;
 import com.left.addd.services.SoundManager.SoundList;
+import com.left.addd.utils.Res;
 import com.left.addd.view.Panner;
 import com.left.addd.view.PannerDesktop;
 import com.left.addd.view.PannerMobile;
 import com.left.addd.model.Direction;
 import com.left.addd.model.Entity;
 import com.left.addd.model.Network;
-import com.left.addd.model.StateChangedListener;
+import com.left.addd.model.MoveStateListener;
 import com.left.addd.model.Tile;
 import com.left.addd.view.GameView;
 import com.left.addd.view.PannerAbstract;
@@ -42,8 +43,9 @@ import com.left.addd.view.TileImageType;
  * Manages the drawing of the model to the screen and player controls. Reference:
  * https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
-public class GameView implements InputProcessor, StateChangedListener<GameModel> {
-	public static final int TILE_LENGTH = 32;
+public class GameView implements InputProcessor, MoveStateListener<GameModel> {
+	public static final int TILE_WIDTH = Res.TILE_WIDTH;
+	public static final int TILE_HEIGHT = Res.TILE_HEIGHT;
 
 	private final AdddGame game;
 	private final GameModel gameModel;
@@ -93,9 +95,9 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 		this.atlas = atlas;
 		this.viewCamera = new OrthographicCamera();
 
-		Vector3 pannerMin = new Vector3((-3) * TILE_LENGTH, (-3) * TILE_LENGTH, 0);
-		Vector3 pannerMax = new Vector3((gameModel.width + 3) * TILE_LENGTH, (gameModel.height + 3)
-				* TILE_LENGTH, 0);
+		Vector3 pannerMin = new Vector3((-3) * TILE_WIDTH, (-3) * TILE_HEIGHT, 0);
+		Vector3 pannerMax = new Vector3((gameModel.width + 3) * TILE_WIDTH, (gameModel.height + 3)
+				* TILE_HEIGHT, 0);
 		switch(Gdx.app.getType()) {
 		case Applet:
 		case Desktop:
@@ -153,7 +155,7 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 		Vector3 touchPoint = new Vector3();
 		touchPoint.set(screenX, screenY, 0);
 		panner.unproject(touchPoint);
-		clickCoordinate.set(touchPoint.x / TILE_LENGTH, touchPoint.y / TILE_LENGTH);
+		clickCoordinate.set(touchPoint.x / TILE_WIDTH, touchPoint.y / TILE_HEIGHT);
 		int x = (int) clickCoordinate.x;
 		int y = (int) clickCoordinate.y;
 		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
@@ -175,7 +177,7 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 		Vector3 touchPoint = new Vector3();
 		touchPoint.set(screenX, screenY, 0);
 		panner.unproject(touchPoint);
-		rightClickCoordinate.set(touchPoint.x / TILE_LENGTH, touchPoint.y / TILE_LENGTH);
+		rightClickCoordinate.set(touchPoint.x / TILE_WIDTH, touchPoint.y / TILE_HEIGHT);
 		int x = (int) rightClickCoordinate.x;
 		int y = (int) rightClickCoordinate.y;
 		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
@@ -197,7 +199,7 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 		Vector3 touchPoint = new Vector3();
 		touchPoint.set(screenX, screenY, 0);
 		panner.unproject(touchPoint);
-		hoverCoordinate.set(touchPoint.x / TILE_LENGTH, touchPoint.y / TILE_LENGTH);
+		hoverCoordinate.set(touchPoint.x / TILE_WIDTH, touchPoint.y / TILE_HEIGHT);
 		int x = (int) hoverCoordinate.x;
 		int y = (int) hoverCoordinate.y;
 		if(0 <= x && x < gameModel.width && 0 <= y && y < gameModel.height) {
@@ -427,7 +429,7 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 			for(int j = 0; j < gameModel.height; j++) {
 				Image image = tileImageCache.get(tileImageTypes[i][j]);
 				if(image != null) {
-					image.setPosition(i * GameView.TILE_LENGTH, j * GameView.TILE_LENGTH);
+					image.setPosition(i * GameView.TILE_WIDTH, j * GameView.TILE_HEIGHT);
 					image.draw(batch, 1f);
 				}
 			}
@@ -442,7 +444,7 @@ public class GameView implements InputProcessor, StateChangedListener<GameModel>
 			int y = tile.y;
 			image = tileImageCache.get(tileImageTypes[x][y]);
 			if(image != null) {
-				image.setPosition(x * GameView.TILE_LENGTH, y * GameView.TILE_LENGTH);
+				image.setPosition(x * GameView.TILE_WIDTH, y * GameView.TILE_HEIGHT);
 				image.setColor(hoverColor);
 				image.draw(batch, 1f);
 				image.setColor(blankColor);

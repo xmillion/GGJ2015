@@ -16,12 +16,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.left.addd.model.Building;
 import com.left.addd.model.NPC;
 import com.left.addd.model.Entity;
-import com.left.addd.model.StateChangedListener;
+import com.left.addd.model.MoveStateListener;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
 import com.left.addd.utils.Res;
 
-public class EntityView implements StateChangedListener<Entity> {
+public class EntityView implements MoveStateListener<Entity> {
 
 	private final TextureAtlas atlas;
 	
@@ -80,7 +80,7 @@ public class EntityView implements StateChangedListener<Entity> {
 					EntityRenderer e = entityMap.get(entity);
 					e.end(current.x, current.y);
 				} else {
-					Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + cEntity.getType().assetName)));
+					Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + cEntity.getAssetName())));
 					EntityRenderer e = new NPCRenderer(image);
 					e.end(current.x, current.y);
 					entityMap.put(entity, e);
@@ -90,11 +90,11 @@ public class EntityView implements StateChangedListener<Entity> {
 				//log("Entity " + entity.getMetadata().get("Name") + " now moving" + pCoords(current));
 				if (entityMap.containsKey(entity)) {
 					EntityRenderer e = entityMap.get(entity);
-					e.start(current.x, current.y, next.x, next.y, Time.getRealTimeFromTicks(cEntity.getMoveDuration()));
+					e.start(current.x, current.y, next.x, next.y, Time.getRealTimeFromTicks(cEntity.getMoveRate()));
 				} else {
-					Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + cEntity.getType().assetName)));
+					Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + cEntity.getAssetName())));
 					EntityRenderer e = new NPCRenderer(image);
-					e.start(current.x, current.y, next.x, next.y, Time.getRealTimeFromTicks(cEntity.getMoveDuration()));
+					e.start(current.x, current.y, next.x, next.y, Time.getRealTimeFromTicks(cEntity.getMoveRate()));
 					entityMap.put(entity, e);
 				}
 			}
@@ -102,7 +102,7 @@ public class EntityView implements StateChangedListener<Entity> {
 			//log ("Building " + entity.getMetadata().get("Name") + " at " + pCoords(entity.getCurrentTile()));
 			Building bEntity = (Building) entity;
 			Tile current = bEntity.getCurrentTile();
-			Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + bEntity.getType().assetName)));
+			Image image = new Image(new TextureRegionDrawable(atlas.findRegion(Res.ENTITIES + bEntity.getAssetName())));
 			BuildingRenderer br = new BuildingRenderer(current.x, current.y, image);
 			entityMap.put(entity, br);
 		}
@@ -126,7 +126,7 @@ public class EntityView implements StateChangedListener<Entity> {
 		}
 		
 		public boolean isInRect(float targetX, float targetY) {
-			return (targetX >= current.x && targetY >= current.y && targetX < current.x + image.getImageWidth() / Res.TILE_LENGTH && targetY < current.y + image.getImageHeight() / Res.TILE_LENGTH);
+			return (targetX >= current.x && targetY >= current.y && targetX < current.x + image.getImageWidth() / Res.TILE_WIDTH && targetY < current.y + image.getImageHeight() / Res.TILE_HEIGHT);
 		}
 
 		@Override
@@ -198,7 +198,7 @@ public class EntityView implements StateChangedListener<Entity> {
 				}
 				current.set(Interpolation.linear.apply(start.x, end.x, progress), Interpolation.linear.apply(start.y, end.y, progress));
 			}
-			image.setPosition(current.x * Res.ENTITY_LENGTH, current.y * Res.ENTITY_LENGTH);
+			image.setPosition(current.x * Res.ENTITY_WIDTH, current.y * Res.ENTITY_HEIGHT);
 			return image;
 		}
 	}
@@ -217,7 +217,7 @@ public class EntityView implements StateChangedListener<Entity> {
 		@Override
 		public void start(float startX, float startY, float endX, float endY, float duration) {
 			current.set(startX, startY);
-			image.setPosition(current.x * Res.ENTITY_LENGTH, current.y * Res.ENTITY_LENGTH);
+			image.setPosition(current.x * Res.ENTITY_WIDTH, current.y * Res.ENTITY_WIDTH);
 		}
 
 		@Override

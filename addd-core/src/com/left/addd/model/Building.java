@@ -37,38 +37,36 @@ public class Building extends Entity {
 		return type.height;
 	}
 	
-	public Type getType() {
-		return type;
+	public String getAssetName() {
+		return type.assetName;
 	}
 	
 	// *** Serialization ***
 
 	/**
-	 * Serialize a Tile into json.
+	 * Serialize a Building into json.
 	 * 
-	 * @param json Json serializer, which will now have the tile's data.
-	 * @param tile Tile to save
+	 * @param json serializer
 	 */
 	@Override
 	public void save(Json json) {
 		json.writeObjectStart("building");
 		json.writeValue("x", this.currentTile.x);
 		json.writeValue("y", this.currentTile.y);
-		json.writeValue("entity_type", "building");
-		json.writeValue("building_type", this.type.name());
+		json.writeValue("type", this.type.name());
 		json.writeObjectEnd();
 	}
 
 	/**
-	 * Create a Tile using a json string.
-	 * 
-	 * @param data
+	 * Create a Building using the json string.
+	 * @param jsonData
+	 * @param gameModel
 	 * @return
 	 */
-	public static Building load(Json json, JsonValue jsonData, GameModel gameModel) {
+	public static Building load(JsonValue jsonData, GameModel gameModel) {
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
-		Type type = Type.valueOf(jsonData.getString("building_type"));
+		Type type = Type.valueOf(jsonData.getString("type"));
 		return new Building(type, gameModel.getTile(x, y));
 	}
 }

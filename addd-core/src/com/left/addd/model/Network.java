@@ -75,7 +75,7 @@ public class Network implements Disposable {
 	 * @param data
 	 * @return
 	 */
-	public static Network load(Json json, JsonValue jsonData, Network south, Network west) {
+	public static Network load(JsonValue jsonData, Network south, Network west) {
 		NetworkType type = NetworkType.valueOf(jsonData.getString("type"));
 		return new Network(type, null, null, south, west);
 	}
