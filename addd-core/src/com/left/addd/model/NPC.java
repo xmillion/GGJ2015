@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.left.addd.utils.LoadingException;
 import com.left.addd.utils.Res;
 
 public class NPC extends Entity {
@@ -57,6 +57,16 @@ public class NPC extends Entity {
 		this.nextTile = tile;
 		this.moveRate = type.moveRate;
 		this.moveProgress = -1;
+	}
+	
+	public void setCurrentTile(Tile t) {
+		if (!currentTile.equals(t)) {
+			super.setCurrentTile(t);
+			moveCompleted();
+			// empty the path queue to update it
+			path.clear();
+			updatePath();
+		}
 	}
 	
 	public String getAssetName() {
@@ -169,7 +179,9 @@ public class NPC extends Entity {
 		moveCompleted();
 	}
 	
+	@Override
 	public void update(int ticks) {
+		super.update(ticks);
 		moveProgress += ticks;
 		if (moveProgress >= moveRate) {
 			finishedMoving();
@@ -208,7 +220,7 @@ public class NPC extends Entity {
 					success = true;
 					break;
 				}
-				int newStepsTaken = currentNode.stepsTaken + 1;
+				int newStepsTaken = currentNode.getStepsTaken() + 1;
 				for (Tile tile: currentNode.tile.getNeighbours()) {
 					if (visitedNodes.containsKey(tile)) {
 						visitedNodes.get(tile).updateNode(newStepsTaken, currentNode);
@@ -219,10 +231,10 @@ public class NPC extends Entity {
 				visitedNodes.put(currentNode.tile, currentNode);
 			}
 			if (success) {
-				while (!currentTile.equals(currentNode.previous.tile)) {
+				while (!currentTile.equals(currentNode.getPrevious().tile)) {
 					// add tiles to the head of the path because it is in reverse order.
 					path.push(currentNode.tile);
-					currentNode = currentNode.previous;
+					currentNode = currentNode.getPrevious();
 				}
 			} else {
 				// FAILURE
@@ -231,53 +243,12 @@ public class NPC extends Entity {
 		}
 	}
 	
-	private boolean findPathToTarget() {
-		if (targetEntity == null) {
-			return false;
-		}
-		int stepsTaken = 0;
-		boolean success = false;
-		Tile targetTile = targetEntity.currentTile;
-		Node currNode = new Node(currentTile, currentTile, 0, null);
-		PriorityQueue<Node> searchList = new PriorityQueue<Node>();
-		HashMap<Tile, Node> visitedNodes = new HashMap<Tile, Node>();
-		searchList.add(new Node(currentTile, targetTile, stepsTaken, null));
-		while(searchList.size()>0) {
-			currNode = searchList.poll();
-			if (currNode.tile == targetTile) {
-				success = true;
-				break;
-			}
-			int newStepsTaken = currNode.stepsTaken + 1;
-			for( Tile tile : currNode.tile.getNeighbours()) {
-				if(visitedNodes.get(tile) != null) {
-					visitedNodes.get(tile).updateNode(newStepsTaken, currNode);
-				} else {
-					searchList.add(new Node(tile, targetTile, newStepsTaken, currNode));
-				}
-			}
-			visitedNodes.put(currNode.tile, currNode);
-		}
-		if (success) {
-			if (currNode.tile == this.currentTile) {
-				return;
-			}
-			while (currNode.previous.tile != this.currentTile) {
-				currNode = currNode.previous;
-			}
-			this.nextTile = currNode.tile;
-		} else {
-			this.nextTile = this.currentTile;
-		}
-		
-		return success;
-	}
-	
 	private class Node implements Comparable<Node> {
 		public final Tile tile;
-		int stepsTaken;
-		double value;
-		Node previous;
+		private int stepsTaken;
+		private double value;
+		private Node previous;
+		
 		public Node(Tile startTile, Tile endTile, int stepsTaken, Node previous) {
 			this.tile = startTile;
 			this.stepsTaken = stepsTaken;
@@ -285,19 +256,23 @@ public class NPC extends Entity {
 			this.value = Math.sqrt(Math.pow(startTile.x - endTile.x, 2) + Math.pow(startTile.y - endTile.y, 2));
 		}
 		
-		void updateNode(int stepsTaken, Node previous) {
+		public void updateNode(int stepsTaken, Node previous) {
 			if (stepsTaken < this.stepsTaken) {
 				this.stepsTaken = stepsTaken;
 				this.previous = previous;
 			}
 		}
 		
-		int getStepsTaken() {
-			return this.stepsTaken;
+		public int getStepsTaken() {
+			return stepsTaken;
 		}
 		
-		double getValue() {
-			return this.stepsTaken + this.value;
+		public double getValue() {
+			return stepsTaken + value;
+		}
+		
+		public Node getPrevious() {
+			return previous;
 		}
 		
 		@Override
@@ -309,10 +284,8 @@ public class NPC extends Entity {
 	// *** Serialization ***
 
 	/**
-	 * Serialize a Tile into json.
-	 * 
-	 * @param json Json serializer, which will now have the tile's data.
-	 * @param tile Tile to save
+	 * Turn an NPC into json.
+	 * @param json
 	 */
 	@Override
 	public void save(Json json) {
@@ -324,18 +297,31 @@ public class NPC extends Entity {
 		// don't need to store movement for now
 		json.writeObjectEnd();
 	}
+	
+	/**
+	 * Loads an NPC from stored ID.
+	 * ID's can come from save data or initialization data.
+	 * @param id
+	 * @return
+	 * @throws LoadingException if no such NPC exists with that ID.
+	 */
+	public static NPC load(long id) throws LoadingException {
+		// TODO id based loading
+		return null;
+	}
 
 	/**
-	 * Create a Tile using a json string.
-	 * 
-	 * @param data
+	 * Loads an NPC from save data.
+	 * @param jsonData
+	 * @param gameModel
 	 * @return
 	 */
-	public static NPC load(Json json, JsonValue jsonData, GameModel gameModel) {
-		long id = jsonData.getLong("id");
-		int x = jsonData.getInt("x");
-		int y = jsonData.getInt("y");
-		Type type = Type.valueOf(jsonData.getString("type"));
+	public static NPC load(JsonValue jsonData, GameModel gameModel) {
+		JsonValue npcJson = jsonData.get("npc");
+		long id = npcJson.getLong("id");
+		int x = npcJson.getInt("x");
+		int y = npcJson.getInt("y");
+		Type type = Type.valueOf(npcJson.getString("type"));
 		return new NPC(id, type, gameModel.getTile(x, y));
 	}
 }

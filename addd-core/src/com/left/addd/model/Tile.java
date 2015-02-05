@@ -96,12 +96,8 @@ public class Tile {
 		}
 	}
 	
-	public Tile tryGetNeighbour(Direction dir, Tile defaultTile) {
-		Tile t = getNeighbour(dir);
-		return Tile.isDummyTile(t) ? defaultTile : t;
-	}
-	
 	public ArrayList<Tile> getNeighbours() {
+		// TODO double check if we need a getNeighbours for non-network tiles
         ArrayList<Tile> Available = new ArrayList<Tile>();
         for (Direction dir : Direction.values()) {
             if (checkForNetwork(dir)) {
@@ -110,6 +106,16 @@ public class Tile {
         }
         return Available;
     }
+	
+	public boolean isNeighbour(Tile t) {
+		// TODO double check if we need a isNeighbour for network tiles
+		for (Direction dir : Direction.values()) {
+			if (t.equals(getNeighbour(dir))) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public Direction getDirection(Tile neighbour) {
 		if (this.equals(neighbour)) {
@@ -145,7 +151,7 @@ public class Tile {
     private boolean checkForNetwork(Direction dir) {
         if (!this.equals(getNeighbour(dir))) {
         	if (getNeighbour(dir).getNetwork() != null) {
-        		if (getNeighbour(dir).getNetwork().type == NetworkType.ROAD) {
+        		if (getNeighbour(dir).getNetwork().type == Network.Type.ROAD) {
                     return true;
                 } else {
                     return false;

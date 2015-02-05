@@ -5,12 +5,16 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class Network implements Disposable {
+	
+	public enum Type {
+		NONE, ROAD;
+	}
 
-	public final NetworkType type;
+	public final Type type;
 
 	private Network[] neighbours;
 	
-	public Network(NetworkType type) {
+	public Network(Type type) {
 		this.type = type;
 		this.neighbours = new Network[Direction.values().length];
 	}
@@ -19,7 +23,7 @@ public class Network implements Disposable {
 	 * Creates a new Network with appropriate connections.
 	 * The connections can be null.
 	 */
-	public Network(NetworkType type, Network north, Network east, Network south, Network west) {
+	public Network(Type type, Network north, Network east, Network south, Network west) {
 		this(type);
 		connect(Direction.NORTH, north);
 		connect(Direction.EAST, east);
@@ -76,7 +80,7 @@ public class Network implements Disposable {
 	 * @return
 	 */
 	public static Network load(JsonValue jsonData, Network south, Network west) {
-		NetworkType type = NetworkType.valueOf(jsonData.getString("type"));
+		Type type = Type.valueOf(jsonData.getString("type"));
 		return new Network(type, null, null, south, west);
 	}
 
