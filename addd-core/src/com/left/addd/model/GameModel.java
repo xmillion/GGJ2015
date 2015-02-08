@@ -24,19 +24,32 @@ public class GameModel {
 	public final int width;
 	public final int height;
 	private Time time;
-	
 	private List<MoveStateListener<GameModel>> listeners;
-	
-	EntityManager em = new EntityManager();
+	private EntityManager em;
 
+	/**
+	 * New GameModel for new game
+	 * @param width
+	 * @param height
+	 */
 	public GameModel(int width, int height) {
 		this(width, height, 0, true);
 	}
 	
+	/**
+	 * Full constructor for new or load game.
+	 * @param width
+	 * @param height
+	 * @param timeInHours
+	 * @param initializeTiles
+	 */
 	public GameModel(int width, int height, long timeInHours, boolean initializeTiles) {
 		this.width = width;
 		this.height = height;
 		this.tiles = new Tile[width][height];
+		this.listeners = new ArrayList<MoveStateListener<GameModel>>();
+		this.em = new EntityManager();
+		
 		if(initializeTiles) {
 			int[][] testMap = new int[][]{
 					{0,0,1,1,0,0,0,0,0,0,0,0,0,0,0},
@@ -142,8 +155,6 @@ public class GameModel {
 		em.addEntity(testEntity7);
 		em.addEntity(testEntity8);
 		testEntity.move(Direction.NORTH);
-		
-		this.listeners = new ArrayList<MoveStateListener<GameModel>>();
 	}
 	
 	public Tile getTileByEntityProperty(){

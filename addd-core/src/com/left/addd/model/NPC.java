@@ -44,12 +44,16 @@ public class NPC extends Entity {
 	
 	private List<MoveStateListener<NPC>> listeners;
 
-	public NPC(Type type, Tile tile) {
-		this(Res.generateId(), type, tile);
+	public NPC(Tile tile, Type type) {
+		this(Res.generateId(), "NPC", null, tile, type);
 	}
 	
-	private NPC(long id, Type type, Tile tile) {
-		super(id, tile);
+	public NPC(String name, String description, Tile tile, Type type) {
+		this(Res.generateId(), name, description, tile, type);
+	}
+	
+	private NPC(long id, String name, String description, Tile tile, Type type) {
+		super(id, name, description, tile);
 		this.type = type;
 		this.targetEntity = null;
 		this.targetTile = null;
@@ -291,6 +295,8 @@ public class NPC extends Entity {
 	public void save(Json json) {
 		json.writeObjectStart("npc");
 		json.writeValue("id", id);
+		json.writeValue("name", getName());
+		json.writeValue("desc", getDescription());
 		json.writeValue("x", currentTile.x);
 		json.writeValue("y", currentTile.y);
 		json.writeValue("type", type.name());
@@ -319,9 +325,11 @@ public class NPC extends Entity {
 	public static NPC load(JsonValue jsonData, GameModel gameModel) {
 		JsonValue npcJson = jsonData.get("npc");
 		long id = npcJson.getLong("id");
+		String name = npcJson.getString("name");
+		String description = npcJson.getString("description");
 		int x = npcJson.getInt("x");
 		int y = npcJson.getInt("y");
 		Type type = Type.valueOf(npcJson.getString("type"));
-		return new NPC(id, type, gameModel.getTile(x, y));
+		return new NPC(id, name, description, gameModel.getTile(x, y), type);
 	}
 }

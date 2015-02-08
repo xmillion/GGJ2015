@@ -181,9 +181,15 @@ public class Objective {
 		if (isComplete(target)) {
 			// TODO maybe the Entity should be responsible for removing the required items, then this function becomes unneccessary.
 			if (requiredItems != null) {
-				// remove required items from source's inventory
+				// Remove required items from source's inventory
 				for (String item: requiredItems.keySet()) {
 					source.removeItem(item, requiredItems.get(item));
+				}
+			}
+			if (chainedObjectives != null) {
+				// Add chained objectives to source.
+				for (Objective obj: chainedObjectives) {
+					source.addObjective(obj);
 				}
 			}
 			return true;

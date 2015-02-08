@@ -12,6 +12,8 @@ import com.left.addd.utils.Res;
 public class Entity {
 
 	public final long id;
+	private String name;
+	private String description;
 	protected Tile currentTile;
 	/**
 	 * An entity's inventory consists of items identified with strings, with quantity as the value in a map.
@@ -23,14 +25,41 @@ public class Entity {
 	private List<Objective> objectives;
 	
 	public Entity(Tile tile) {
-		this(Res.generateId(), tile);
+		this(Res.generateId(), "Entity", "", tile);
 	}
 	
-	protected Entity(long id, Tile tile) {
+	public Entity(String name, String description, Tile tile) {
+		this(Res.generateId(), name, description, tile);
+	}
+	
+	/**
+	 * Full constructor for the serializer
+	 * @param id
+	 * @param tile
+	 */
+	protected Entity(long id, String name, String description, Tile tile) {
 		this.id = id;
+		this.name = name;
+		this.description = description;
 		this.currentTile = tile;
 		this.inventory = new HashMap<String, Integer>();
 		this.objectives = new ArrayList<Objective>();
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public Tile getCurrentTile() {
@@ -106,6 +135,10 @@ public class Entity {
 		return objectives.get(0);
 	}
 	
+	public void addObjective(Objective obj) {
+		objectives.add(obj);
+	}
+	
 	/**
 	 * Update any objectives involving the given entity.
 	 * This doesn't update the partner's objectives. To do that, call partner.interact(this);
@@ -122,7 +155,8 @@ public class Entity {
 	}
 	
 	public void update(int ticks) {
-		// find neighbours
+		// find neighbours, or have gamemodel give you neighbours using interact();
+		// interact with them
 	}
 	
 	// *** Serialization ***
@@ -134,6 +168,8 @@ public class Entity {
 	public void save(Json json) {
 		json.writeObjectStart("entity");
 		json.writeValue("id", id);
+		json.writeValue("name", name);
+		json.writeValue("desc", description);
 		json.writeValue("x", currentTile.x);
 		json.writeValue("y", currentTile.y);
 		// TODO there's a few more fields
@@ -161,8 +197,10 @@ public class Entity {
 	public static Entity load(JsonValue jsonData, GameModel gameModel) {
 		JsonValue entityJson = jsonData.get("entity");
 		long id = entityJson.getLong("id");
+		String name = entityJson.getString("name");
+		String description = entityJson.getString("desc");
 		int x = entityJson.getInt("x");
 		int y = entityJson.getInt("y");
-		return new Entity(id, gameModel.getTile(x, y));
+		return new Entity(id, name, description, gameModel.getTile(x, y));
 	}
 }
