@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.left.addd.AdddGame;
 import com.left.addd.model.GameModel;
@@ -68,21 +69,29 @@ public class GameSerializer {
 		saveFile.writeString(data, false);
 	}
 
+	public GameModel load(int slot) throws LoadingException {
+		return load(getSaveFileHandle(slot));
+	}
+	
+	public GameModel loadInitial() throws LoadingException {
+		return load(Gdx.files.local("assets/data/initial.json"));
+	}
+	
 	/**
-	 * Loads a saved TemplateModel.
-	 * @return The saved TemplateModel. Throws exceptions if file not found,
+	 * Loads a saved GameModel.
+	 * @return The saved GameModel. Throws exceptions if file not found,
 	 *  file not readable, or no such slot.
 	 */
-	public GameModel load(int slot) throws LoadingException {
+	private GameModel load(FileHandle handle) throws LoadingException {
 		try {
-			FileHandle saveFile = getSaveFileHandle(slot);
-			log("Load", "Loading from " + saveFile.path());
-			String data = saveFile.readString().trim();
+			log("Load", "Loading from " + handle.path());
+			String data = handle.readString().trim();
 			if(data.matches("^[A-Za-z0-9/+=]+$")) {
 				log("Load", "File is base64 encoded");
 				data = Base64Coder.decodeString(data);
 			}
-			return json.fromJson(GameModel.class, data);
+			//return json.fromJson(GameModel.class, data);
+			return GameModel.load(new JsonReader().parse(data));
 		} catch(IllegalArgumentException e) {
 			throw new LoadingException(e.getMessage());
 		} catch(GdxRuntimeException e) {

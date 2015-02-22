@@ -1,8 +1,13 @@
 package com.left.addd.model;
 
+import static com.left.addd.utils.Log.log;
+import static com.left.addd.utils.Log.pCoords;
+
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.left.addd.utils.Utils;
+
 import java.util.ArrayList;
 
 /**
@@ -11,36 +16,62 @@ import java.util.ArrayList;
  */
 public class Tile {
 	private static Tile dummyTile;
-
-	protected final GameModel gameModel;
-	public final int x;
-	public final int y;
-
-	private Network network;
-
-	public Tile(GameModel gameModel) {
-		this(gameModel, -1, -1, null);
+	
+	public enum Type {
+		EMPTY("grass", false, false),
+		BUILDING("building", false, false),
+		ROAD("road", true, true),
+		PATH("path", true, false);
+		
+		public final String assetName;
+		/** if true, then it can be used for pathfinding. */
+		public final boolean isNetwork;
+		/** if true, then the asset or properties can change based on its neighbouring tiles. */
+		public final boolean isDynamic;
+		private Type(String assetName, boolean isNetwork, boolean isDynamic) {
+			this.assetName = assetName;
+			this.isNetwork = isNetwork;
+			this.isDynamic = isDynamic;
+		}
 	}
 
-	public Tile(GameModel gameModel, int x, int y) {
-		this(gameModel, x, y, null);
+	protected final TileManager manager;
+	public final int x;
+	public final int y;
+	private Type type;
+
+	/**
+	 * Create a dummy tile. Don't use these.<br>
+	 * Instead, check if a tile is a dummy tile with Tile.isDummyTile(t);<br>
+	 * before using them.
+	 * @param gameModel
+	 */
+	public Tile(TileManager tileManager) {
+		this(tileManager, -1, -1, Type.EMPTY);
 	}
 
 	/**
 	 * Create a Tile.
-	 * 
-	 * @param gameModel Governing model
-	 * @param x coordinate
-	 * @param y coordinate
-	 * @param building Building on this Tile
-	 * @param network Network on this Tile
+	 * @param gameModel
+	 * @param x
+	 * @param y
 	 */
-	public Tile(GameModel gameModel, int x, int y, Network network) {
-		this.gameModel = gameModel;
+	public Tile(TileManager tileManager, int x, int y) {
+		this(tileManager, x, y, Type.EMPTY);
+	}
+	
+	/**
+	 * Create a Tile.
+	 * @param gameModel
+	 * @param x
+	 * @param y
+	 * @param type
+	 */
+	public Tile(TileManager tileManager, int x, int y, Type type) {
+		this.manager = tileManager;
 		this.x = x;
 		this.y = y;
-
-		this.network = network;
+		this.type = type;
 	}
 
 	public static Tile dummyTile() {
@@ -54,57 +85,57 @@ public class Tile {
 	public static boolean isDummyTile(Tile t) {
 		return t.equals(dummyTile);
 	}
-
-	public Network getNetwork() {
-		return network;
-	}
-
-	public void setNetwork(Network network) {
-		// connect neighbours if possible
-		for(Direction dir: Direction.values()) {
-			Tile t = getNeighbour(dir);
-			if(t.hasNetwork()) {
-				network.connect(dir, t.getNetwork());
-			}
-		}
-		this.network = network;
-	}
-
-	public void clearNetwork() {
-		// disconnect neighbours
-		this.network.dispose();
-		this.network = null;
-	}
-
-	public boolean hasNetwork() {
-		return this.network != null;
+	
+	public Type getType() {
+		return type;
 	}
 	
+	public void setType(Type type) {
+		this.type = type;
+	}
+	
+	public boolean isNetwork() {
+		return type.isNetwork;
+	}
+
+	public boolean isDynamic() {
+		return type.isDynamic;
+	}
+	
+	/**
+	 * Returns the tile in the given direction.<br>
+	 * Check if it's valid using Tile.isDummyTile() first!
+	 * @param dir Direction from this tile
+	 * @return Tile in that direction
+	 */
 	public Tile getNeighbour(Direction dir) {
 		switch(dir) {
 		case NORTH:
-			return gameModel.getTile(x, y + 1);
+			return manager.getTile(x, y + 1);
 		case EAST:
-			return gameModel.getTile(x + 1, y);
+			return manager.getTile(x + 1, y);
 		case SOUTH:
-			return gameModel.getTile(x, y - 1);
+			return manager.getTile(x, y - 1);
 		case WEST:
-			return gameModel.getTile(x - 1, y);
+			return manager.getTile(x - 1, y);
 		default:
 			// unreachable code
-			return gameModel.getTile(x, y);
+			return manager.getTile(x, y);
 		}
 	}
 	
+	/**
+	 * Returns up to 4 Tiles, which are the tiles in each direction.<br>
+	 * Check if it's valid using Tile.isDummyTile() first!
+	 * @return Tiles in all 4 directions
+	 */
 	public ArrayList<Tile> getNeighbours() {
 		// TODO double check if we need a getNeighbours for non-network tiles
-        ArrayList<Tile> Available = new ArrayList<Tile>();
+        ArrayList<Tile> available = new ArrayList<Tile>();
         for (Direction dir : Direction.values()) {
-            if (checkForNetwork(dir)) {
-                Available.add(getNeighbour(dir));
-            }
+        	available.add(getNeighbour(dir));
         }
-        return Available;
+        return available;
     }
 	
 	public boolean isNeighbour(Tile t) {
@@ -123,53 +154,70 @@ public class Tile {
 		}
 		int deltaX = neighbour.x - this.x;
 		int deltaY = neighbour.y - this.y;
+		// slice diagonally
 		if (deltaX > deltaY) {
 			// south or east
-			if (deltaX < 0) {
+			if (deltaY < 0 && deltaX < -deltaY) {
 				return Direction.SOUTH;
-			}
-		} else {
-			// north or west
-		}
-		
-		
-		if (deltaX > 0) {
-			if (deltaY > deltaX) {
-				return Direction.NORTH;
 			} else {
 				return Direction.EAST;
 			}
 		} else {
-			if (deltaY > deltaX) {
+			if (deltaY > 0 && deltaY > -deltaX) {
 				return Direction.NORTH;
 			} else {
 				return Direction.WEST;
 			}
 		}
 	}
-    
-    private boolean checkForNetwork(Direction dir) {
-        if (!this.equals(getNeighbour(dir))) {
-        	if (getNeighbour(dir).getNetwork() != null) {
-        		if (getNeighbour(dir).getNetwork().type == Network.Type.ROAD) {
-                    return true;
-                } else {
-                    return false;
-                }
-        	} else {
-        		return false;
-        	}
-        } else {
-            return false;
-        }
-    }
 
 	// *** Rules ***
 
 	public void update(int delta) {
-		if(network != null) {
-			network.update(delta);
+		// nothing here at the moment
+	}
+	
+	/**
+	 * Provides information about this Tile
+	 * 
+	 * @return Tile info
+	 */
+	public String query() {
+		// TODO query's final form should return a Query object, not a string
+		if(Tile.isDummyTile(this)) {
+			log("Query", "Not a Tile " + pCoords(this.x, this.y));
+			return "";
 		}
+
+		StringBuilder query = new StringBuilder();
+
+		// Tile data
+		query.append("Tile ");
+		query.append(pCoords(this.x, this.y));
+		query.append(" is type ");
+		query.append(this.getType().name());
+		query.append(".\n");
+
+		// Network data
+		for(Direction dir: Direction.values()) {
+			Tile neighbour = getNeighbour(dir);
+			if(Tile.isDummyTile(neighbour)) {
+				query.append("No ");
+				query.append(dir.name());
+				query.append(" neighbour.\n");
+			} else {
+				query.append(dir.name());
+				query.append(" neighbour is type ");
+				query.append(neighbour.getType().name());
+				if (neighbour.isNetwork()) {
+					query.append(" (is network).\n");
+				} else {
+					query.append(" (not network).\n");
+				}
+			}
+		}
+		log(":::Query:::", query.toString());
+		return query.toString();
 	}
 
 	// *** Serialization ***
@@ -184,9 +232,7 @@ public class Tile {
 		json.writeObjectStart();
 		json.writeValue("x", this.x);
 		json.writeValue("y", this.y);
-		if(hasNetwork()) {
-			network.save(json);
-		}
+		json.writeValue("type", type.name());
 		json.writeObjectEnd();
 	}
 
@@ -196,20 +242,11 @@ public class Tile {
 	 * @param data
 	 * @return
 	 */
-	public static Tile load(JsonValue jsonData, GameModel gameModel) {
+	public static Tile load(JsonValue jsonData, TileManager tileManager) {
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
-
-		JsonValue networkData = jsonData.get("network");
-		Network network = null;
-		if(networkData != null) {
-			// Can only load tiles[x][y-1] and tiles[x-1][y]
-			// because the next ones haven't been initialized yet.
-			network = Network.load(networkData, gameModel.getTile(x, y - 1).getNetwork(),
-					gameModel.getTile(x - 1, y).getNetwork());
-		}
-
-		return new Tile(gameModel, x, y, network);
+		Type type = Type.valueOf(jsonData.getString("type"));
+		return new Tile(tileManager, x, y, type);
 	}
 
 	/**
@@ -217,7 +254,7 @@ public class Tile {
 	 */
 	@Override
 	public int hashCode() {
-		return x * gameModel.width + y;
+		return x * manager.width + y;
 	}
 
 	/**

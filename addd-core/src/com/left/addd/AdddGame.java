@@ -62,7 +62,7 @@ public class AdddGame extends Game implements ApplicationListener {
 		case GAME:
 			if(nextScreenState >= 0) {
 				try {
-					// Load game
+					// Load game from save file
 					GameModel model = gameSerializer.load(nextScreenState);
 					screen = new GameScreen(this, model);
 				} catch (LoadingException e) {
@@ -71,7 +71,16 @@ public class AdddGame extends Game implements ApplicationListener {
 					screen = new MainMenuScreen(this);
 				}
 			} else {
-				screen = new GameScreen(this);
+				try {
+					// Create new game from initial state
+					GameModel model = gameSerializer.loadInitial();
+					screen = new GameScreen(this, model);
+				} catch (LoadingException e) {
+					// TODO show a notification on the screen
+					log("Failed to initialize game.");
+					// Load blank game
+					screen = new GameScreen(this);
+				}
 			}
 			break;
 		default:

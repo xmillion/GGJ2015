@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.left.addd.model.GameModel;
-import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
 import com.left.addd.model.Time;
 
@@ -20,34 +19,54 @@ import com.left.addd.model.Time;
  * Reference: https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
 public class GameModel {
-	private final Tile[][] tiles;
-	public final int width;
-	public final int height;
 	private Time time;
-	private List<MoveStateListener<GameModel>> listeners;
+	private TileManager tileManager;
 	private EntityManager em;
 
 	/**
-	 * New GameModel for new game
+	 * For serializer use only! It's incomplete.
+	 */
+	private GameModel(long timeInHours) {
+		this.time = new Time(timeInHours);
+	}
+	
+	/**
+	 * New GameModel for a new game
 	 * @param width
 	 * @param height
 	 */
 	public GameModel(int width, int height) {
-		this(width, height, 0, true);
+		this(0, new TileManager(width, height, true), new EntityManager());
 	}
 	
 	/**
-	 * Full constructor for new or load game.
-	 * @param width
-	 * @param height
-	 * @param timeInHours
-	 * @param initializeTiles
+	 * Generate a GameModel with predefined parts.
+	 * @param timeInHours In game time
+	 * @param tiles Pre-generated Tiles
+	 * @param entities Pre-defined Entities
 	 */
+	public GameModel(long timeInHours, Tile[][] tiles, List<Entity> entities) {
+		this(timeInHours, new TileManager(tiles), new EntityManager(entities));
+	}
+	
+	/**
+	 * Full constructor.
+	 * @param timeInHours
+	 * @param tileManager
+	 * @param entityManager
+	 */
+	private GameModel(long timeInHours, TileManager tileManager, EntityManager entityManager) {
+		this.time = new Time(timeInHours);
+		this.tileManager = tileManager;
+		this.em = entityManager;
+	}
+	
+	// TODO replicate this info in json format
+	/*
 	public GameModel(int width, int height, long timeInHours, boolean initializeTiles) {
 		this.width = width;
 		this.height = height;
 		this.tiles = new Tile[width][height];
-		this.listeners = new ArrayList<MoveStateListener<GameModel>>();
 		this.em = new EntityManager();
 		
 		if(initializeTiles) {
@@ -156,36 +175,24 @@ public class GameModel {
 		em.addEntity(testEntity8);
 		testEntity.move(Direction.NORTH);
 	}
-	
-	public Tile getTileByEntityProperty(){
-		return new Tile(this,-1,-1,null);
-	}
+	*/
 	
 	public Time getTime() {
 		return time;
 	}
 	
-	public List<Entity> getEntities() {
-		return em.getEntities();
+	public TileManager getTileManager() {
+		return tileManager;
 	}
-
+	
 	public Tile[][] getTiles() {
-		return tiles;
+		return tileManager.getTiles();
+	}
+	
+	public Tile getTile(int x, int y) {
+		return tileManager.getTile(x, y);
 	}
 
-	public Tile getTile(int x, int y) {
-		if(0 > x || x >= width || 0 > y || y >= height) {
-			// log("Not a Tile: " + Utils.pCoords(x, y));
-			return Tile.dummyTile();
-		}
-		return tiles[x][y];
-	}
-	
-	public void addListener(MoveStateListener<GameModel> listener) {
-		this.listeners.add(listener);
-		listener.OnStateChanged(this);
-	}
-	
 	/**
 	 * Provides information on the given Tile.
 	 * 
@@ -194,92 +201,35 @@ public class GameModel {
 	 * @return Tile info
 	 */
 	public String query(int x, int y) {
-		// TODO query's final form should return a Query object, not a debug string
-		Tile tile = getTile(x, y);
-		if(Tile.isDummyTile(tile)) {
-			log("Query", "Not a Tile " + pCoords(tile.x, tile.y));
-			return "";
-		}
-
-		StringBuilder query = new StringBuilder();
-
-		// Tile data
-		query.append("Tile " + pCoords(tile.x, tile.y));
-		query.append(".\n");
-
-		// Network data
-		if(tile.hasNetwork()) {
-			Network n = tile.getNetwork();
-			query.append("Network: " + n.type.name());
-		} else {
-			query.append("No network");
-		}
-		query.append(".\n");
-
-		log(":::Query::", query.toString());
-		return query.toString();
+		return tileManager.query(x, y);
+	}
+	
+	public List<Entity> getEntities() {
+		return em.getEntities();
 	}
 	
 	public void update(float delta) {
 		int ticks = time.update(delta);
-		updateTiles(ticks);
-		updateEntities(ticks);
-		em.checkObjectivesAndUpdateTargets();
-	}
-
-	private void updateTiles(int ticks) {
-		for(Tile[] ts: tiles) {
-			for(Tile t: ts) {
-				t.update(ticks);
-			}
-		}
+		tileManager.update(ticks);
+		em.update(ticks);
 	}
 	
-	private void updateEntities(int ticks) {
-		for(Entity e : em.getEntities()) {
-			e.update(ticks);
-		}
-	}
+	// *** Serialization ***
 	
 	public void save(Json json) {
-		json.writeObjectStart();
-		json.writeValue("width", width);
-		json.writeValue("height", height);
+		json.writeObjectStart("game");
 		json.writeValue("time", time.getTime());
-		json.writeArrayStart("tiles");
-		for(int i = 0; i < width; i++) {
-			for(int j = 0; j < height; j++) {
-				tiles[i][j].save(json);
-			}
-		}
-		json.writeArrayEnd();
+		tileManager.save(json);
+		em.save(json);
 		json.writeObjectEnd();
 	}
 
 	public static GameModel load(JsonValue jsonData) {
-		int width = jsonData.getInt("width");
-		int height = jsonData.getInt("height");
-		long timeInHours = jsonData.getLong("time");
-		GameModel gameModel = new GameModel(width, height, timeInHours, false);
-
-		JsonValue tileData = jsonData.get("tiles");
-
-		JsonValue tileValue;
-		for(int i = 0; i < tileData.size; i++) {
-			tileValue = tileData.get(i);
-			Tile tile = Tile.load(tileValue, gameModel);
-			gameModel.tiles[tile.x][tile.y] = tile;
-		}
-		
-		JsonValue entityData = jsonData.get("entities");
-		JsonValue entityValue;
-		for(int i = 0; i < entityData.size; i++) {
-			entityValue = entityData.get(i);
-			Entity entity = Entity.load(entityValue, gameModel);
-			gameModel.em.addEntity(entity);
-		}
-		
-
+		JsonValue gameJson = jsonData.get("game");
+		long timeInHours = gameJson.getLong("time");
+		GameModel gameModel = new GameModel(timeInHours);
+		gameModel.tileManager = TileManager.load(gameJson, gameModel);
+		gameModel.em = EntityManager.load(gameJson, gameModel);
 		return gameModel;
 	}
 }

@@ -155,8 +155,7 @@ public class Entity {
 	}
 	
 	public void update(int ticks) {
-		// find neighbours, or have gamemodel give you neighbours using interact();
-		// interact with them
+		// Nothing here but subclasses can override.
 	}
 	
 	// *** Serialization ***

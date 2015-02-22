@@ -43,7 +43,7 @@ import com.left.addd.view.TileImageType;
  * Manages the drawing of the model to the screen and player controls. Reference:
  * https://github.com/libgdx/libgdx/tree/master/demos/very-angry-robots/very-angry-robots/src/com/badlydrawngames/veryangryrobots
  */
-public class GameView implements InputProcessor, MoveStateListener<GameModel> {
+public class GameView implements InputProcessor {
 	public static final int TILE_WIDTH = Res.TILE_WIDTH;
 	public static final int TILE_HEIGHT = Res.TILE_HEIGHT;
 
@@ -133,7 +133,6 @@ public class GameView implements InputProcessor, MoveStateListener<GameModel> {
 
 		this.tileImageTypes = new TileImageType[gameModel.width][gameModel.height];
 		updateAllTiles();
-		create();
 	}
 
 	// ********************
@@ -403,10 +402,6 @@ public class GameView implements InputProcessor, MoveStateListener<GameModel> {
 	// **** Rendering *****
 	// ********************
 
-	public void create() {
-		gameModel.addListener(this);
-	}
-
 	public void render(SpriteBatch batch, float delta) {
 		// Pan camera
 		panKeyboard();
@@ -486,13 +481,5 @@ public class GameView implements InputProcessor, MoveStateListener<GameModel> {
 		viewCamera.viewportHeight = height;
 		viewCamera.position.set(0, 0, 0);
 		viewCamera.update();
-	}
-
-	public void OnStateChanged(GameModel gameModel) {
-		log("GameView", "GameModel state changed");
-		final List<Entity> entities = gameModel.getEntities();
-		for(Entity e: entities) {
-			e.addStateChangedListener(entityView);
-		}
 	}
 }

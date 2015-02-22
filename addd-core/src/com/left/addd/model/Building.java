@@ -27,6 +27,8 @@ public class Building extends Entity {
 	public Building(Type type, Tile currentTile) {
 		super(currentTile);
 		this.type = type;
+		// TODO when this building is constructed, the tiles which this occupies must be rendered impassable (ie. it's no longer a network)
+		// TODO that means any tile that doesn't have a building on it is a network by default. let's remove networks from the game if this is true.
 	}
 
 	public int getWidth() {
