@@ -1,7 +1,6 @@
 package com.left.addd.view;
 
 import com.left.addd.model.Direction;
-import com.left.addd.model.Network;
 import com.left.addd.model.Tile;
 import com.left.addd.utils.Res;
 
@@ -41,68 +40,79 @@ public enum TileImageType {
 	}
 	
 	/**
-	 * Returns the appropriate TileImageType given the Tile.
-	 * @param tile legitimate tile
+	 * Returns the appropriate TileImageType.
+	 * @param tile
+	 * @return
 	 */
-	public static TileImageType getImageFromTile(Tile tile) {
-		if(tile.hasNetwork()) {
-			Network network = tile.getNetwork();
-			// Check neighbours
-			boolean n = network.getNeighbour(Direction.NORTH) != null;
-			boolean e = network.getNeighbour(Direction.EAST) != null;
-			boolean s = network.getNeighbour(Direction.SOUTH) != null;
-			boolean w = network.getNeighbour(Direction.WEST) != null;
-			
-			// Update self
-			switch(network.type) {
-			case ROAD:
-				if(n && e && s && w) {
-					return TileImageType.ROAD_X;
-				} else if(n && s) {
-					if(e) {
-						return TileImageType.ROAD_TE;
-					} else if(w) {
-						return TileImageType.ROAD_TW;
-					} else {
-						return TileImageType.ROAD_V;
-					}
-				} else if(e && w) {
-					if(n) {
-						return TileImageType.ROAD_TN;
-					} else if(s) {
-						return TileImageType.ROAD_TS;
-					} else {
-						return TileImageType.ROAD_H;
-					}
-				} else if(n) {
-					if(e) {
-						return TileImageType.ROAD_NE;
-					} else if(w) {
-						return TileImageType.ROAD_NW;
-					} else {
-						return TileImageType.ROAD_N;
-					}
-				} else if(s) {
-					if(e) {
-						return TileImageType.ROAD_SE;
-					} else if(w) {
-						return TileImageType.ROAD_SW;
-					} else {
-						return TileImageType.ROAD_S;
-					}
-				} else if(e) {
-					return TileImageType.ROAD_E;
-				} else if(w) {
-					return TileImageType.ROAD_W;
-				} else {
-					// isolated road piece
-					return TileImageType.ROAD_H;
-				}
-			default:
-				return TileImageType.NONE;
+	public static TileImageType getImageTypeFromTile(Tile tile) {
+		switch(tile.getType()) {
+		case EMPTY:
+			return GRASS;
+		case BUILDING:
+			return BLANK;
+		case ROAD:
+			return getRoadImageTypeFromTile(tile);
+		case PATH:
+			return PATH;
+		default:
+			return BLANK;
+		}
+	}
+	
+	/**
+	 * Returns the appropriate Road TileImageType. Road is dynamic and is affected by its neighbours.
+	 * @param tile
+	 * @return
+	 */
+	private static TileImageType getRoadImageTypeFromTile(Tile tile) {
+		// Check neighbours
+		boolean n = tile.getNeighbour(Direction.NORTH) != null;
+		boolean e = tile.getNeighbour(Direction.EAST) != null;
+		boolean s = tile.getNeighbour(Direction.SOUTH) != null;
+		boolean w = tile.getNeighbour(Direction.WEST) != null;
+		
+		// Update self
+		if(n && e && s && w) {
+			return TileImageType.ROAD_X;
+		} else if(n && s) {
+			if(e) {
+				return TileImageType.ROAD_TE;
+			} else if(w) {
+				return TileImageType.ROAD_TW;
+			} else {
+				return TileImageType.ROAD_V;
 			}
+		} else if(e && w) {
+			if(n) {
+				return TileImageType.ROAD_TN;
+			} else if(s) {
+				return TileImageType.ROAD_TS;
+			} else {
+				return TileImageType.ROAD_H;
+			}
+		} else if(n) {
+			if(e) {
+				return TileImageType.ROAD_NE;
+			} else if(w) {
+				return TileImageType.ROAD_NW;
+			} else {
+				return TileImageType.ROAD_N;
+			}
+		} else if(s) {
+			if(e) {
+				return TileImageType.ROAD_SE;
+			} else if(w) {
+				return TileImageType.ROAD_SW;
+			} else {
+				return TileImageType.ROAD_S;
+			}
+		} else if(e) {
+			return TileImageType.ROAD_E;
+		} else if(w) {
+			return TileImageType.ROAD_W;
 		} else {
-			return TileImageType.BLANK;
+			// isolated road piece
+			return TileImageType.ROAD_H;
 		}
 	}
 }

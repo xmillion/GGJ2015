@@ -97,7 +97,7 @@ public abstract class AbstractScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		log("Resize " + getName() + " to " + width + "x" + height);
+		//log("Resize " + getName() + " to " + width + "x" + height);
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public abstract class AbstractScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		log("Dispose " + getName());
+		//log("Dispose " + getName());
 		if(font != null)
 			font.dispose();
 		if(batch != null)

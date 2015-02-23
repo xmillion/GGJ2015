@@ -74,7 +74,8 @@ public class GameSerializer {
 	}
 	
 	public GameModel loadInitial() throws LoadingException {
-		return load(Gdx.files.local("assets/data/initial.json"));
+		return new GameModel(true);
+		//return load(Gdx.files.local("assets/data/initial.json"));
 	}
 	
 	/**
@@ -93,6 +94,7 @@ public class GameSerializer {
 			//return json.fromJson(GameModel.class, data);
 			return GameModel.load(new JsonReader().parse(data));
 		} catch(IllegalArgumentException e) {
+			e.printStackTrace();
 			throw new LoadingException(e.getMessage());
 		} catch(GdxRuntimeException e) {
 			throw new LoadingException(e.getMessage());

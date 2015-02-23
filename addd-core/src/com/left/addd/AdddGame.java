@@ -109,7 +109,6 @@ public class AdddGame extends Game implements ApplicationListener {
 
 	@Override
 	public void create() {
-		log("Create Game");
 		preferenceManager = new PreferenceManager();
 		
 		gameSerializer = new GameSerializer();

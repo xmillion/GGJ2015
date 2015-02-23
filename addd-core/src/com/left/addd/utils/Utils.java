@@ -1,13 +1,6 @@
 package com.left.addd.utils;
 
 public class Utils {
-	public static String coords(int x, int y) {
-		return "(" + x + ", " + y + ")";
-	}
-
-	public static String pCoords(float x, float y) {
-		return "(" + x + ", " + y + ")";
-	}
 	
 	public static int min(int x, int y) {
 		return x < y? x:y;

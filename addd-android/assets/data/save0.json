@@ -1,0 +1,1305 @@
+{
+time: 1
+tm: {
+	width: 15
+	height: 15
+	tiles: [
+		{
+			x: 0
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 2
+			type: "ROAD"
+		}
+		{
+			x: 0
+			y: 3
+			type: "ROAD"
+		}
+		{
+			x: 0
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 9
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 0
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 3
+			type: "ROAD"
+		}
+		{
+			x: 1
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 1
+			y: 10
+			type: "ROAD"
+		}
+		{
+			x: 1
+			y: 11
+			type: "ROAD"
+		}
+		{
+			x: 1
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 1
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 1
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 2
+			type: "ROAD"
+		}
+		{
+			x: 2
+			y: 3
+			type: "ROAD"
+		}
+		{
+			x: 2
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 2
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 2
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 7
+			type: "ROAD"
+		}
+		{
+			x: 2
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 2
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 2
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 3
+			y: 6
+			type: "ROAD"
+		}
+		{
+			x: 3
+			y: 7
+			type: "ROAD"
+		}
+		{
+			x: 3
+			y: 8
+			type: "ROAD"
+		}
+		{
+			x: 3
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 3
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 3
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 4
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 4
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 4
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 5
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 5
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 5
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 6
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 6
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 6
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 4
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 7
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 7
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 7
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 8
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 8
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 8
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 8
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 8
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 6
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 7
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 8
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 10
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 11
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 13
+			type: "ROAD"
+		}
+		{
+			x: 8
+			y: 14
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 0
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 1
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 2
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 3
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 7
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 9
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 9
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 9
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 0
+			type: "ROAD"
+		}
+		{
+			x: 10
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 10
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 9
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 10
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 10
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 0
+			type: "ROAD"
+		}
+		{
+			x: 11
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 3
+			type: "ROAD"
+		}
+		{
+			x: 11
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 11
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 8
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 9
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 11
+			type: "ROAD"
+		}
+		{
+			x: 11
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 11
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 11
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 12
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 12
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 12
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 12
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 12
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 5
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 6
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 7
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 8
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 10
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 11
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 12
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 12
+			y: 14
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 0
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 1
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 2
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 3
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 13
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 8
+			type: "ROAD"
+		}
+		{
+			x: 13
+			y: 9
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 10
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 11
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 12
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 13
+			type: "EMPTY"
+		}
+		{
+			x: 13
+			y: 14
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 0
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 1
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 2
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 3
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 4
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 5
+			type: "EMPTY"
+		}
+		{
+			x: 14
+			y: 6
+			type: "EMPTY"
+		}
+		{
+			x: 14
+			y: 7
+			type: "EMPTY"
+		}
+		{
+			x: 14
+			y: 8
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 9
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 10
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 11
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 12
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 13
+			type: "ROAD"
+		}
+		{
+			x: 14
+			y: 14
+			type: "ROAD"
+		}
+	]
+}
+em: {
+	entities: [
+		{
+			sub: "building"
+			id: 1424676987939
+			name: "Hotel"
+			desc: "This is where Alice and Chad go when they get it on"
+			x: 12
+			y: 0
+			type: "HOUSE"
+			objectives: []
+		}
+		{
+			sub: "building"
+			id: 1424676987940
+			name: "Bob's Workplace"
+			desc: "This is where Bob works while Alice cheats on him"
+			x: 1
+			y: 13
+			type: "FACTORY"
+			objectives: []
+		}
+		{
+			sub: "building"
+			id: 1424676987941
+			name: "School"
+			desc: "This is Alice's school"
+			x: 5
+			y: 3
+			type: "SCHOOL"
+			objectives: []
+		}
+		{
+			sub: "building"
+			id: 1424676987942
+			name: "Library"
+			desc: "Students study here"
+			x: 10
+			y: 13
+			type: "LIBRARY"
+			objectives: []
+		}
+		{
+			sub: "npc"
+			id: 1424676987936
+			name: "Alice"
+			desc: "Alice is a homewrecker and gets with Bob and Chad"
+			x: 0
+			y: 2
+			type: "STUDENT"
+			objectives: [
+				{
+					id: 1424676987948
+					target: 1424676987937
+				}
+				{
+					id: 1424676987949
+					target: 1424676987938
+				}
+				{
+					id: 1424676987950
+					target: 1424676987939
+				}
+			]
+		}
+		{
+			sub: "npc"
+			id: 1424676987937
+			name: "Bob"
+			desc: "Bob is a hardworking family man"
+			x: 2
+			y: 2
+			type: "HERO"
+			objectives: [
+				{
+					id: 1424676987951
+					target: 1424676987936
+				}
+				{
+					id: 1424676987952
+					target: 1424676987940
+				}
+				{
+					id: 1424676987962
+					target: 1424676987943
+					chain: [ 1424676987953, 1424676987954, 1424676987955, 1424676987956, 1424676987957, 1424676987958, 1424676987959, 1424676987960, 1424676987961 ]
+				}
+				{
+					id: 1424676987964
+					target: 1424676987945
+					chain: [ 1424676987963 ]
+				}
+			]
+		}
+		{
+			sub: "npc"
+			id: 1424676987938
+			name: "Chad"
+			desc: "Fucking Chad"
+			x: 13
+			y: 14
+			type: "FACULTY"
+			objectives: [
+				{
+					id: 1424676987965
+					target: 1424676987936
+				}
+				{
+					id: 1424676987966
+					target: 1424676987939
+				}
+			]
+		}
+		{
+			sub: "npc"
+			id: 1424676987943
+			name: "Bob's Bad Influence #1"
+			desc: "Always distracts Bob"
+			x: 2
+			y: 7
+			type: "FACULTY"
+			objectives: []
+		}
+		{
+			sub: "npc"
+			id: 1424676987944
+			name: "Bob's Bad Influence #2"
+			desc: "Always distracts Bob"
+			x: 11
+			y: 11
+			type: "FACULTY"
+			objectives: []
+		}
+		{
+			sub: "npc"
+			id: 1424676987945
+			name: "POPO"
+			desc: "Reminds Bob to be an upstanding, working citizen"
+			x: 9
+			y: 7
+			type: "POLICE"
+			objectives: []
+		}
+		{
+			sub: "npc"
+			id: 1424676987946
+			name: "Some Random Dude"
+			desc: "He looks a stoned"
+			x: 11
+			y: 3
+			type: "FACULTY"
+			objectives: []
+		}
+		{
+			sub: "npc"
+			id: 1424676987947
+			name: "Runner"
+			desc: "He likes shorts. They're comfortable and easy to wear"
+			x: 12
+			y: 4
+			type: "FACULTY"
+			objectives: [
+				{
+					id: 1424676987976
+					target: 1424676987946
+					chain: [ 1424676987967, 1424676987968, 1424676987969, 1424676987970, 1424676987971, 1424676987972, 1424676987973, 1424676987974, 1424676987975 ]
+				}
+			]
+		}
+	]
+}
+}

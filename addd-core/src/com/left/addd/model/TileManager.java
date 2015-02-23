@@ -72,7 +72,8 @@ public class TileManager {
 	// *** Serialization ***
 
 	public void save(Json json) {
-		json.writeObjectStart();
+		// TODO save tiles as a char array or string or something, to save space.
+		json.writeObjectStart("tm");
 		json.writeValue("width", width);
 		json.writeValue("height", height);
 		json.writeArrayStart("tiles");
@@ -86,9 +87,10 @@ public class TileManager {
 	}
 
 	public static TileManager load(JsonValue jsonData, GameModel model) {
-		int width = jsonData.getInt("width");
-		int height = jsonData.getInt("height");
-		JsonValue tileJson = jsonData.get("tiles");
+		JsonValue tileData = jsonData.get("tm");
+		int width = tileData.getInt("width");
+		int height = tileData.getInt("height");
+		JsonValue tileJson = tileData.get("tiles");
 		TileManager tileManager = new TileManager(width, height, false);
 		JsonValue tileValue;
 		for(int i = 0; i < tileJson.size; i++) {

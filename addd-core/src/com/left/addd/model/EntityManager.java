@@ -1,10 +1,13 @@
 package com.left.addd.model;
 
+import static com.left.addd.utils.Log.log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+
 
 public class EntityManager {
 	
@@ -43,10 +46,10 @@ public class EntityManager {
 		// TODO improve the algorithm
 		for (Entity first: entities) {
 			// Find neighbouring entities for this entity
-			List<Tile> neighbouringTiles = first.getCurrentTile().getNeighbours();
-			neighbouringTiles.add(first.getCurrentTile());
+			List<Tile> neighbouringTiles = first.getTile().getNeighbours();
+			neighbouringTiles.add(first.getTile());
 			for (Entity second: entities) {
-				if (!first.equals(second) && neighbouringTiles.equals(second.getCurrentTile())) {
+				if (!first.equals(second) && neighbouringTiles.contains(second.getTile())) {
 					// Have the entity interact with the neighbour
 					first.interact(second);
 				}
@@ -80,8 +83,10 @@ public class EntityManager {
 	public static EntityManager load(JsonValue jsonData, GameModel gameModel) {
 		JsonValue entityJson = jsonData.get("em").get("entities");
 		List<Entity> entities = new ArrayList<Entity>();
-		for(JsonValue ent = entityJson.child(); ent != null; ent = entityJson.next()) {
-			entities.add(Entity.load(ent, gameModel));
+		JsonValue entityValue;
+		for(int i = 0; i < entityJson.size; i++) {
+			entityValue = entityJson.get(i);
+			entities.add(Entity.load(entityValue, gameModel));
 		}
 		
 		return new EntityManager(entities);

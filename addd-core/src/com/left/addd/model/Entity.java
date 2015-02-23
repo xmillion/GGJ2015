@@ -1,8 +1,12 @@
 package com.left.addd.model;
 
+import static com.left.addd.utils.Log.log;
+import static com.left.addd.utils.Log.pCoords;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -14,15 +18,15 @@ public class Entity {
 	public final long id;
 	private String name;
 	private String description;
-	protected Tile currentTile;
+	protected Tile tile;
 	/**
 	 * An entity's inventory consists of items identified with strings, with quantity as the value in a map.
 	 */
-	private HashMap<String, Integer> inventory;
+	protected HashMap<String, Integer> inventory;
 	/**
 	 * Objectives are in a sorted list. The top priority is always at the head of the list.
 	 */
-	private List<Objective> objectives;
+	protected List<Objective> objectives;
 	
 	public Entity(Tile tile) {
 		this(Res.generateId(), "Entity", "", tile);
@@ -41,7 +45,7 @@ public class Entity {
 		this.id = id;
 		this.name = name;
 		this.description = description;
-		this.currentTile = tile;
+		this.tile = tile;
 		this.inventory = new HashMap<String, Integer>();
 		this.objectives = new ArrayList<Objective>();
 	}
@@ -61,13 +65,21 @@ public class Entity {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	/**
+	 * Asset name for rendering. Subclasses must override this...
+	 * @return
+	 */
+	public String getAssetName() {
+		return "tile";
+	}
 
-	public Tile getCurrentTile() {
-		return currentTile;
+	public Tile getTile() {
+		return tile;
 	}
 
 	public void setCurrentTile(Tile t) {
-		this.currentTile = t;
+		this.tile = t;
 	}
 	
 	/**
@@ -75,7 +87,7 @@ public class Entity {
 	 * @return true if the given entity is neighbouring this entity.
 	 */
 	public boolean isAdjacentTo(Entity entity) {
-		return currentTile.isNeighbour(entity.currentTile);
+		return tile.isNeighbour(entity.tile);
 	}
 	
 	// *** Inventory ***
@@ -127,11 +139,14 @@ public class Entity {
 	// *** Objectives ***
 	
 	public List<Objective> getObjectives() {
-		// TODO this is supposed to be hidden?
+		// TODO this is supposed to be public or protected?
 		return objectives;
 	}
 
 	public Objective getCurrentObjective() {
+		if (objectives.isEmpty()) {
+			return null;
+		}
 		return objectives.get(0);
 	}
 	
@@ -145,13 +160,39 @@ public class Entity {
 	 * @param partner
 	 */
 	public void interact(Entity target) {
-		List<Objective> objectivesToRemove = new ArrayList<Objective>();
+		List<Objective> completedObjectives = new ArrayList<Objective>();
+		// Can't edit objectives in-line due to concurrent modification limitation.
 		for (Objective obj: objectives) {
-			if (obj.update(this, target)) {
-				objectivesToRemove.add(obj);
+			if (obj.isComplete(this, target)) {
+				completedObjectives.add(obj);
 			}
 		}
-		objectives.removeAll(objectivesToRemove);
+		
+		// Update inventory and objectives.
+		for (Objective obj: completedObjectives) {
+			
+			Map<String, Integer> requiredItems = obj.getRequiredItems();
+			Map<String, Integer> rewardItems = obj.getRewardItems();
+			List<Objective> chainedObjectives = obj.getChainedObjectives();
+			if (requiredItems != null) {
+				for (String item: requiredItems.keySet()) {
+					removeItem(item, requiredItems.get(item));
+				}
+			}
+			if (rewardItems != null) {
+				for (String item: rewardItems.keySet()) {
+					addItem(item, rewardItems.get(item));
+				}
+			}
+			if (chainedObjectives != null) {
+				for (Objective chainedObj: chainedObjectives) {
+					addObjective(chainedObj);
+				}
+			}
+		}
+		
+		// Objective completed!
+		objectives.removeAll(completedObjectives);
 	}
 	
 	public void update(int ticks) {
@@ -165,13 +206,20 @@ public class Entity {
 	 * @param json
 	 */
 	public void save(Json json) {
-		json.writeObjectStart("entity");
+		json.writeObjectStart();
+		json.writeValue("sub", "entity");
 		json.writeValue("id", id);
 		json.writeValue("name", name);
 		json.writeValue("desc", description);
-		json.writeValue("x", currentTile.x);
-		json.writeValue("y", currentTile.y);
-		// TODO there's a few more fields
+		json.writeValue("x", tile.x);
+		json.writeValue("y", tile.y);
+		json.writeValue("type", "entity");
+		json.writeArrayStart("objectives");
+		for (Objective obj: objectives) {
+			obj.save(json);
+		}
+		// TODO inventory
+		json.writeArrayEnd();
 		json.writeObjectEnd();
 	}
 	
@@ -194,12 +242,26 @@ public class Entity {
 	 * @return
 	 */
 	public static Entity load(JsonValue jsonData, GameModel gameModel) {
-		JsonValue entityJson = jsonData.get("entity");
-		long id = entityJson.getLong("id");
-		String name = entityJson.getString("name");
-		String description = entityJson.getString("desc");
-		int x = entityJson.getInt("x");
-		int y = entityJson.getInt("y");
-		return new Entity(id, name, description, gameModel.getTile(x, y));
+		String sub = jsonData.getString("sub");
+		if (sub.equalsIgnoreCase("building")) {
+			return Building.load(jsonData, gameModel);
+		} else if (sub.equalsIgnoreCase("npc")) {
+			return NPC.load(jsonData, gameModel);
+		} else {
+			long id = jsonData.getLong("id");
+			String name = jsonData.getString("name");
+			String description = jsonData.getString("desc");
+			int x = jsonData.getInt("x");
+			int y = jsonData.getInt("y");
+			List<Objective> objectives = new ArrayList<Objective>();
+			JsonValue objectiveJson = jsonData.get("objectives");
+			JsonValue objectiveValue;
+			for(int i = 0; i < objectiveJson.size; i++) {
+				objectiveValue = objectiveJson.get(i);
+				Objective obj = Objective.load(objectiveValue, gameModel);
+				objectives.add(obj);
+			}
+			return new Entity(id, name, description, gameModel.getTile(x, y));
+		}
 	}
 }

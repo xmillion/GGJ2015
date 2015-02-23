@@ -96,6 +96,18 @@ public class Objective {
 	}
 	
 	/**
+	 * Objective of gathering items and using them on a target entity, with a reward.
+	 * Completing the objective causes the chained objectives to be added to the entity.
+	 * @param target
+	 * @param requiredItems
+	 * @param rewardItems
+	 * @param chainedObjectives
+	 */
+	public Objective(Entity target, HashMap<String, Integer> requiredItems, HashMap<String, Integer> rewardItems, List<Objective> chainedObjectives) {
+		this(Res.generateId(), target, requiredItems, rewardItems, chainedObjectives);
+	}
+	
+	/**
 	 * Full constructor for the serializer.
 	 * @param id
 	 * @param target
@@ -124,7 +136,7 @@ public class Objective {
 	
 	public HashMap<String, Integer> getRequiredItems() {
 		// return a copy, so the original cannot be mutated.
-		return new HashMap<String, Integer>(requiredItems);
+		return (requiredItems == null) ? null : new HashMap<String, Integer>(requiredItems);
 	}
 	
 	public int getRewardItemAmount(String itemName) {
@@ -136,20 +148,35 @@ public class Objective {
 	
 	public HashMap<String, Integer> getRewardItems() {
 		// return a copy, so the original cannot be mutated.
-		return new HashMap<String, Integer>(rewardItems);
+		return (rewardItems == null) ? null : new HashMap<String, Integer>(rewardItems);
+	}
+	
+	public List<Objective> getChainedObjectives() {
+		// return a copy, so the original cannot be mutated.
+		return (chainedObjectives == null) ? null : new ArrayList<Objective>(chainedObjectives);
 	}
 	
 	public boolean isComplete(Entity source) {
 		return isTargetComplete(source) && isRequiredItemsComplete(source); 
 	}
 	
+	public boolean isComplete(Entity source, Entity target) {
+		return isTargetComplete(source, target) && isRequiredItemsComplete(source); 
+	}
+	
 	public boolean isTargetComplete(Entity source) {
-		if (target == null) {
-			return true;
-		} else if (source == null) {
+		return isTargetComplete(source, null);
+	}
+	
+	public boolean isTargetComplete(Entity source, Entity target) {
+		if (source == null) {
 			return false;
+		} else if (this.target == null) {
+			return true;
+		} else if (target != null && this.target.equals(target)) {
+			return true;
 		} else {
-			return source.isAdjacentTo(target);
+			return source.isAdjacentTo(this.target);
 		}
 	}
 	
@@ -178,7 +205,7 @@ public class Objective {
 	 * false if the objective has not completed. No changes have been made to the owner.
 	 */
 	public boolean update(Entity source, Entity target) {
-		if (isComplete(target)) {
+		if (isComplete(source, target)) {
 			// TODO maybe the Entity should be responsible for removing the required items, then this function becomes unneccessary.
 			if (requiredItems != null) {
 				// Remove required items from source's inventory
@@ -204,7 +231,7 @@ public class Objective {
 	 * @param json
 	 */
 	public void save(Json json) {
-		json.writeObjectStart("objective");
+		json.writeObjectStart();
 		json.writeValue("id", id);
 		if (target != null) {
 			json.writeValue("target", target.id);
@@ -258,15 +285,14 @@ public class Objective {
 	 * @return
 	 */
 	public static Objective load(JsonValue jsonData, GameModel gameModel) {
-		JsonValue objectiveJson = jsonData.get("objective");
-		long id = objectiveJson.getLong("id");
+		long id = jsonData.getLong("id");
 		Entity target = null;
-		if (objectiveJson.hasChild("target")) {
-			target = Entity.load(objectiveJson, gameModel);
+		if (jsonData.hasChild("target")) {
+			target = Entity.load(jsonData, gameModel);
 		}
 		HashMap<String, Integer> requiredItems = null;
-		if (objectiveJson.hasChild("required")) {
-			JsonValue requiredJson = objectiveJson.get("required");
+		if (jsonData.hasChild("required")) {
+			JsonValue requiredJson = jsonData.get("required");
 			requiredItems = new HashMap<String, Integer>();
 			for (JsonValue item = requiredJson.child(); item != null; item = item.next()) {
 				int amount = item.getInt("amount");
@@ -276,8 +302,8 @@ public class Objective {
 			}
 		}
 		HashMap<String, Integer> rewardItems = null;
-		if (objectiveJson.hasChild("reward")) {
-			JsonValue rewardJson = objectiveJson.get("reward");
+		if (jsonData.hasChild("reward")) {
+			JsonValue rewardJson = jsonData.get("reward");
 			rewardItems = new HashMap<String, Integer>();
 			for (JsonValue item = rewardJson.child(); item != null; item = item.next()) {
 				int amount = item.getInt("amount");
@@ -287,8 +313,8 @@ public class Objective {
 			}
 		}
 		List<Objective> chainedObjectives = null;
-		if (objectiveJson.hasChild("chain")) {
-			JsonValue chainJson = objectiveJson.get("chain");
+		if (jsonData.hasChild("chain")) {
+			JsonValue chainJson = jsonData.get("chain");
 			chainedObjectives = new ArrayList<Objective>();
 			for (JsonValue objective = chainJson.child(); objective != null; objective = objective.next()) {
 				long chainId = objective.asLong();

@@ -1,7 +1,11 @@
 package com.left.addd.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.left.addd.utils.Res;
 
 public class Building extends Entity {
 
@@ -24,11 +28,32 @@ public class Building extends Entity {
 	
 	public final Type type;
 
-	public Building(Type type, Tile currentTile) {
-		super(currentTile);
+	public Building(Type type, Tile tile) {
+		this(Res.generateId(), "Building", "", tile, type);
+	}
+	
+	public Building(String name, String description, Tile tile, Type type) {
+		this(Res.generateId(), name, description, tile, type);
+	}
+
+	/**
+	 * Full constructor for serializer
+	 * @param id
+	 * @param name
+	 * @param description
+	 * @param tile
+	 * @param type
+	 */
+	private Building(long id, String name, String description, Tile tile, Type type) {
+		super(id, name, description, tile);
 		this.type = type;
-		// TODO when this building is constructed, the tiles which this occupies must be rendered impassable (ie. it's no longer a network)
-		// TODO that means any tile that doesn't have a building on it is a network by default. let's remove networks from the game if this is true.
+		
+		// When this building is constructed, the tiles underneath must be set to EMPTY so they don't become networks.
+		for (Tile ti = tile; !Tile.isDummyTile(ti) && (ti.x < tile.x + type.width); ti = ti.tryGetNeighbour(Direction.EAST)) {
+			for (Tile tj = ti; !Tile.isDummyTile(tj) && (tj.y < tile.y + type.height); tj = tj.tryGetNeighbour(Direction.NORTH)) {
+				tj.setType(Tile.Type.EMPTY);
+			}
+		}
 	}
 
 	public int getWidth() {
@@ -39,6 +64,7 @@ public class Building extends Entity {
 		return type.height;
 	}
 	
+	@Override
 	public String getAssetName() {
 		return type.assetName;
 	}
@@ -52,10 +78,20 @@ public class Building extends Entity {
 	 */
 	@Override
 	public void save(Json json) {
-		json.writeObjectStart("building");
-		json.writeValue("x", this.currentTile.x);
-		json.writeValue("y", this.currentTile.y);
+		json.writeObjectStart();
+		json.writeValue("sub", "building");
+		json.writeValue("id", id);
+		json.writeValue("name", getName());
+		json.writeValue("desc", getDescription());
+		json.writeValue("x", this.tile.x);
+		json.writeValue("y", this.tile.y);
 		json.writeValue("type", this.type.name());
+		json.writeArrayStart("objectives");
+		for (Objective obj: objectives) {
+			obj.save(json);
+		}
+		// TODO inventory
+		json.writeArrayEnd();
 		json.writeObjectEnd();
 	}
 
@@ -66,9 +102,20 @@ public class Building extends Entity {
 	 * @return
 	 */
 	public static Building load(JsonValue jsonData, GameModel gameModel) {
+		long id = jsonData.getLong("id");
+		String name = jsonData.getString("name");
+		String description = jsonData.getString("desc");
 		int x = jsonData.getInt("x");
 		int y = jsonData.getInt("y");
 		Type type = Type.valueOf(jsonData.getString("type"));
-		return new Building(type, gameModel.getTile(x, y));
+		List<Objective> objectives = new ArrayList<Objective>();
+		JsonValue objectiveJson = jsonData.get("objectives");
+		JsonValue objectiveValue;
+		for(int i = 0; i < objectiveJson.size; i++) {
+			objectiveValue = objectiveJson.get(i);
+			Objective obj = Objective.load(objectiveValue, gameModel);
+			objectives.add(obj);
+		}
+		return new Building(id, name, description, gameModel.getTile(x, y), type);
 	}
 }

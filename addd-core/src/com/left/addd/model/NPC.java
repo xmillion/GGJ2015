@@ -1,11 +1,16 @@
 package com.left.addd.model;
 
+import static com.left.addd.utils.Log.log;
+import static com.left.addd.utils.Log.pCoords;
+
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.left.addd.utils.LoadingException;
@@ -15,15 +20,15 @@ public class NPC extends Entity {
 	
 	public enum Type {
 		NONE(1, "main"),
-		HERO(5, "old"),
-		POLICE(3, "redshirt"),
-		FACULTY(7, "blueshirt"),
-		STUDENT(2, "young");
+		HERO(0.2f, "old"),
+		POLICE(1/3f, "redshirt"),
+		FACULTY(1/7f, "blueshirt"),
+		STUDENT(0.5f, "young");
 		
-		public final int moveRate;
+		public final float moveSpeed;
 		public final String assetName;
-		private Type(int moveRate, String assetName) {
-			this.moveRate = moveRate;
+		private Type(float moveSpeed, String assetName) {
+			this.moveSpeed = moveSpeed;
 			this.assetName = assetName;
 		}
 	}
@@ -37,12 +42,14 @@ public class NPC extends Entity {
 	private Deque<Tile> path;
 	/** Cache the neighbouring tile for movement. */
 	private Tile nextTile;
-	/** Number of ticks it takes to move to the next tile. */
-	private int moveRate;
-	/** Ticks remaining until the move completes. Negative if not moving. */
-	private int moveProgress;
-	
-	private List<MoveStateListener<NPC>> listeners;
+	/** Cache the direction of the neighbouring tile. */
+	private Direction nextDirection;
+	/** The speed of this NPC is measured in tiles per second (real time) */
+	private float moveSpeed;
+	/** The progress of this NPC's movement, from 0 (start) to 1 (complete). -1 when it's not moving. */
+	private float moveProgress;
+	/** Floating point form of its current tile, to account for movement. */
+	private Vector2 tileCoordinate;
 
 	public NPC(Tile tile, Type type) {
 		this(Res.generateId(), "NPC", null, tile, type);
@@ -52,6 +59,14 @@ public class NPC extends Entity {
 		this(Res.generateId(), name, description, tile, type);
 	}
 	
+	/**
+	 * Full constructor for serializer
+	 * @param id
+	 * @param name
+	 * @param description
+	 * @param tile
+	 * @param type
+	 */
 	private NPC(long id, String name, String description, Tile tile, Type type) {
 		super(id, name, description, tile);
 		this.type = type;
@@ -59,20 +74,24 @@ public class NPC extends Entity {
 		this.targetTile = null;
 		this.path = new LinkedList<Tile>();
 		this.nextTile = tile;
-		this.moveRate = type.moveRate;
+		this.moveSpeed = type.moveSpeed;
 		this.moveProgress = -1;
+		this.tileCoordinate = new Vector2(tile.x, tile.y);
 	}
 	
+	@Override
 	public void setCurrentTile(Tile t) {
-		if (!currentTile.equals(t)) {
+		if (!tile.equals(t)) {
 			super.setCurrentTile(t);
-			moveCompleted();
 			// empty the path queue to update it
 			path.clear();
-			updatePath();
+			if (targetEntity != null) {
+				findPathToTarget();
+			}
 		}
 	}
 	
+	@Override
 	public String getAssetName() {
 		return type.assetName;
 	}
@@ -85,83 +104,47 @@ public class NPC extends Entity {
 		return nextTile;
 	}
 
-	public int getMoveRate() {
-		return moveRate;
+	/**
+	 * Gets the move rate in real time.
+	 * @return
+	 */
+	public float getMoveSpeed() {
+		return moveSpeed;
 	}
 
-	public void setMoveRate(int rate) {
-		this.moveRate = rate;
+	/**
+	 * Sets the move rate in real time.
+	 * @param speed
+	 */
+	public void setMoveSpeed(float speed) {
+		this.moveSpeed = speed;
 	}
 
-	public int getMoveProgress() {
+	/**
+	 * Gets the move progress in real time.
+	 * @return
+	 */
+	public float getMoveProgress() {
 		return moveProgress;
+	}
+	
+	public Direction getMoveDirection() {
+		return nextDirection;
+	}
+	
+	public Vector2 getTileCoordinate() {
+		return tileCoordinate;
 	}
 	
 	public boolean isMoving() {
 		// All of the following are true if this is moving:
-		// targetEntity != null
+		// targetEntity != null;
 		// !path.isEmpty();
-		// nextTile != tile;
-		// moveProgress >= 0
-		return moveProgress >= 0;
-	}
-	
-	// *** Listener ***
-	
-	public void addMoveStateListener(MoveStateListener<NPC> listener) {
-		if (!listeners.contains(listener)) {
-			this.listeners.add(listener);
-			// initial trigger
-			if (isMoving()) {
-				listener.OnMoveStarted(this);
-			} else {
-				listener.OnMoveCompleted(this);
-			}
-		}
-	}
-	
-	public void removeMoveStateListener(MoveStateListener<NPC> listener) {
-		listeners.remove(listener);
-	}
-	
-	private void moveStarted() {
-		for(MoveStateListener<NPC> listener: listeners) {
-			listener.OnMoveStarted(this);
-		}
-	}
-	
-	private void moveCompleted() {
-		for(MoveStateListener<NPC> listener: listeners) {
-			listener.OnMoveCompleted(this);
-		}
+		// moveProgress < 0;
+		return nextDirection != null;
 	}
 	
 	// *** Movement ***
-	
-	/**
-	 * Start moving to an adjacent tile
-	 */
-	public void move() {
-		if (!path.isEmpty()) {
-			nextTile = path.poll();
-		}
-		if (currentTile.equals(nextTile)) {
-			// we're already there.
-			pause();
-		} else {
-			moveProgress = 0;
-			moveStarted();
-		}
-	}
-	
-	/**
-	 * Stop moving for the time being. Resume with move().
-	 */
-	public void pause() {
-		nextTile = currentTile;
-		moveProgress = -1;
-		moveCompleted();
-	}
 	
 	/**
 	 * Stop moving and remove the current path.
@@ -169,29 +152,84 @@ public class NPC extends Entity {
 	public void stop() {
 		targetEntity = null;
 		path.clear();
-		nextTile = currentTile;
+		nextTile = tile;
+		nextDirection = null;
 		moveProgress = -1;
-		moveCompleted();
 	}
-
+	
 	/**
-	 * Complete the move to the adjacent tile.
+	 * Start moving towards the current target if there is one.
 	 */
-	private void finishedMoving() {
-		currentTile = nextTile;
-		moveProgress = -1;
-		moveCompleted();
+	public void start() {
+		// If this is called mid-move, I think it'll jitter.
+		if (tile.equals(nextTile)) {
+			// It's not moving, lets see if it should be moving.
+			if (targetEntity == null) {
+				// Actively move towards the next objective with a target if possible.
+				for (Objective obj: getObjectives()) {
+					if (!obj.isTargetComplete(this)) {
+						log(getName(), getObjectives().size() + " objectives. Next up is " + obj.getTarget().getName());
+						targetEntity = obj.getTarget();
+						findPathToTarget();
+						break;
+					}
+				}
+			} else if (!path.isEmpty() && targetTile.equals(targetEntity.tile)) {
+				// Continue along the path.
+				nextTile = path.poll();
+				if (!tile.equals(nextTile)) {
+					nextDirection = tile.getDirection(nextTile);
+					moveProgress = 0;
+				}
+			} else {
+				// Regenerate a path and use it.
+				path.clear();
+				findPathToTarget();
+			}
+		}
 	}
 	
 	@Override
 	public void update(int ticks) {
 		super.update(ticks);
-		moveProgress += ticks;
-		if (moveProgress >= moveRate) {
-			finishedMoving();
-			// update this.path if needed
-			updatePath();
-			move();
+		if (nextDirection == null) {
+			// Start the next move.
+			start();
+		}
+	}
+	
+	/**
+	 * Render function for more fluid movement.
+	 * @param delta
+	 */
+	public void render(float delta) {
+		if (nextDirection != null) {
+			moveProgress += delta * moveSpeed;
+			if (moveProgress > 1.0f) {
+				// finish moving.
+				tile = nextTile;
+				nextDirection = null;
+				moveProgress = -1;
+				tileCoordinate.set(tile.x, tile.y);
+			} else {
+				float moveX = tile.x;
+				float moveY = tile.y;
+				switch(nextDirection) {
+				case NORTH:
+					moveY += moveProgress;
+					break;
+				case EAST:
+					moveX += moveProgress;
+					break;
+				case SOUTH:
+					moveY -= moveProgress;
+					break;
+				case WEST:
+					moveX -= moveProgress;
+					break;
+				}
+				tileCoordinate.set(moveX, moveY);
+			}
 		}
 	}
 	
@@ -199,51 +237,56 @@ public class NPC extends Entity {
 	
 	/**
 	 * Update this.path using pathfinding algorithm.
+	 * Ensure that targetEntity != null before calling this.
 	 */
-	private void updatePath() {
-		if (targetEntity == null) {
-			// no target, don't move
-			stop();
+	private void findPathToTarget() {
+		if (tile.equals(targetEntity.tile)) {
+			// we're already here.
+			targetEntity = null;
 			return;
-		} else if (!path.isEmpty() && targetTile.equals(targetEntity.currentTile)) {
-			// no change needed for path.
-			return;
-		} else {
-			// path is empty or target moved, need to regenerate this.path.
-			targetTile = targetEntity.currentTile;
-			int stepsTaken = 0;
-			boolean success = false;
-			Node currentNode = new Node(currentTile, targetTile, stepsTaken, null);
-			PriorityQueue<Node> searchList = new PriorityQueue<Node>(); // frontier
-			HashMap<Tile, Node> visitedNodes = new HashMap<Tile, Node>();
+		}
+		
+		targetTile = targetEntity.tile;
+		int stepsTaken = 0;
+		boolean success = false;
+		Node currentNode = new Node(tile, targetTile, stepsTaken, null);
+		PriorityQueue<Node> searchList = new PriorityQueue<Node>(); // frontier
+		HashMap<Tile, Node> visitedNodes = new HashMap<Tile, Node>();
+		
+		searchList.add(currentNode);
+		while (searchList.size() > 0) {
+			currentNode = searchList.poll();
+			// just being in a neighbouring tile is close enough for entity interaction.
+			if (targetTile.equals(currentNode.tile)) {
+				success = true;
+				break;
+			}
 			
-			searchList.add(currentNode);
-			while (searchList.size() > 0) {
-				currentNode = searchList.poll();
-				if (targetTile.equals(currentNode.tile)) {
-					success = true;
+			int newStepsTaken = currentNode.getStepsTaken() + 1;
+			for (Tile tile: currentNode.tile.getNeighbours()) {
+				if (Tile.isDummyTile(tile)) {
+					continue;
+				} else if (visitedNodes.containsKey(tile)) {
+					visitedNodes.get(tile).updateNode(newStepsTaken, currentNode);
+				} else if (tile.isNetwork() || tile.equals(targetTile)) {
+					searchList.add(new Node(tile, targetTile, newStepsTaken, currentNode));
+				}
+			}
+			visitedNodes.put(currentNode.tile, currentNode);
+		}
+		
+		if (success) {
+			while (!tile.equals(currentNode.tile)) {
+				path.push(currentNode.tile);
+				currentNode = currentNode.getPrevious();
+				if (currentNode == null) {
+					log("Pathfinder", "Beginning of path doesn't match current tile.");
 					break;
 				}
-				int newStepsTaken = currentNode.getStepsTaken() + 1;
-				for (Tile tile: currentNode.tile.getNeighbours()) {
-					if (visitedNodes.containsKey(tile)) {
-						visitedNodes.get(tile).updateNode(newStepsTaken, currentNode);
-					} else {
-						searchList.add(new Node(tile, targetTile, newStepsTaken, currentNode));
-					}
-				}
-				visitedNodes.put(currentNode.tile, currentNode);
 			}
-			if (success) {
-				while (!currentTile.equals(currentNode.getPrevious().tile)) {
-					// add tiles to the head of the path because it is in reverse order.
-					path.push(currentNode.tile);
-					currentNode = currentNode.getPrevious();
-				}
-			} else {
-				// FAILURE
-				stop();
-			}
+		} else {
+			// FAILURE
+			stop();
 		}
 	}
 	
@@ -283,6 +326,11 @@ public class NPC extends Entity {
 		public int compareTo(Node other) {
 			return (this.getValue() < other.getValue()) ? -1 : 1;
 		}
+		
+		@Override
+		public String toString() {
+			return "Node=" + pCoords(tile) + " Previous=" + ((previous == null) ? "null" : pCoords(previous.tile)) + " Steps=" + stepsTaken +" Value=" + value;
+		}
 	}
 	
 	// *** Serialization ***
@@ -293,13 +341,20 @@ public class NPC extends Entity {
 	 */
 	@Override
 	public void save(Json json) {
-		json.writeObjectStart("npc");
+		json.writeObjectStart();
+		json.writeValue("sub", "npc");
 		json.writeValue("id", id);
 		json.writeValue("name", getName());
 		json.writeValue("desc", getDescription());
-		json.writeValue("x", currentTile.x);
-		json.writeValue("y", currentTile.y);
+		json.writeValue("x", tile.x);
+		json.writeValue("y", tile.y);
 		json.writeValue("type", type.name());
+		json.writeArrayStart("objectives");
+		for (Objective obj: objectives) {
+			obj.save(json);
+		}
+		// TODO inventory
+		json.writeArrayEnd();
 		// don't need to store movement for now
 		json.writeObjectEnd();
 	}
@@ -323,13 +378,20 @@ public class NPC extends Entity {
 	 * @return
 	 */
 	public static NPC load(JsonValue jsonData, GameModel gameModel) {
-		JsonValue npcJson = jsonData.get("npc");
-		long id = npcJson.getLong("id");
-		String name = npcJson.getString("name");
-		String description = npcJson.getString("description");
-		int x = npcJson.getInt("x");
-		int y = npcJson.getInt("y");
-		Type type = Type.valueOf(npcJson.getString("type"));
+		long id = jsonData.getLong("id");
+		String name = jsonData.getString("name");
+		String description = jsonData.getString("desc");
+		int x = jsonData.getInt("x");
+		int y = jsonData.getInt("y");
+		Type type = Type.valueOf(jsonData.getString("type"));
+		List<Objective> objectives = new ArrayList<Objective>();
+		JsonValue objectiveJson = jsonData.get("objectives");
+		JsonValue objectiveValue;
+		for(int i = 0; i < objectiveJson.size; i++) {
+			objectiveValue = objectiveJson.get(i);
+			Objective obj = Objective.load(objectiveValue, gameModel);
+			objectives.add(obj);
+		}
 		return new NPC(id, name, description, gameModel.getTile(x, y), type);
 	}
 }

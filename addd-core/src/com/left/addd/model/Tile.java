@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * A Grid is made up of many interconnected Tiles.
  */
 public class Tile {
-	private static Tile dummyTile;
+	private static Tile dummyTile = new Tile(null, -1, -1, null);
 	
 	public enum Type {
 		EMPTY("grass", false, false),
@@ -23,15 +23,68 @@ public class Tile {
 		ROAD("road", true, true),
 		PATH("path", true, false);
 		
+		/** Used by renderer. If isDynamic == true, use getDynamicAssetName instead. */
 		public final String assetName;
-		/** if true, then it can be used for pathfinding. */
+		/** If true, then it can be used for pathfinding. */
 		public final boolean isNetwork;
-		/** if true, then the asset or properties can change based on its neighbouring tiles. */
+		/** If true, then the asset or properties can change based on its neighbouring tiles. */
 		public final boolean isDynamic;
 		private Type(String assetName, boolean isNetwork, boolean isDynamic) {
 			this.assetName = assetName;
 			this.isNetwork = isNetwork;
 			this.isDynamic = isDynamic;
+		}
+		
+		public String getDynamicAssetName(boolean n, boolean e, boolean s, boolean w) {
+			if (!isDynamic) {
+				return assetName;
+			}
+
+			String dynamic;
+			if(n && e && s && w) {
+				dynamic = "-x";
+			} else if(n && s) {
+				if(e) {
+					dynamic = "-te";
+				} else if(w) {
+					dynamic = "-tw";
+				} else {
+					dynamic = "-v";
+				}
+			} else if(e && w) {
+				if(n) {
+					dynamic = "-tn";
+				} else if(s) {
+					dynamic = "-ts";
+				} else {
+					dynamic = "-h";
+				}
+			} else if(n) {
+				if(e) {
+					dynamic = "-ne";
+				} else if(w) {
+					dynamic = "-nw";
+				} else {
+					dynamic = "-n";
+				}
+			} else if(s) {
+				if(e) {
+					dynamic = "-se";
+				} else if(w) {
+					dynamic = "-sw";
+				} else {
+					dynamic = "-s";
+				}
+			} else if(e) {
+				dynamic = "-e";
+			} else if(w) {
+				dynamic = "-w";
+			} else {
+				// isolated road piece
+				dynamic = "-o";
+			}
+			
+			return assetName + dynamic;
 		}
 	}
 
@@ -44,7 +97,7 @@ public class Tile {
 	 * Create a dummy tile. Don't use these.<br>
 	 * Instead, check if a tile is a dummy tile with Tile.isDummyTile(t);<br>
 	 * before using them.
-	 * @param gameModel
+	 * @param tileManager
 	 */
 	public Tile(TileManager tileManager) {
 		this(tileManager, -1, -1, Type.EMPTY);
@@ -52,7 +105,7 @@ public class Tile {
 
 	/**
 	 * Create a Tile.
-	 * @param gameModel
+	 * @param tileManager
 	 * @param x
 	 * @param y
 	 */
@@ -62,7 +115,7 @@ public class Tile {
 	
 	/**
 	 * Create a Tile.
-	 * @param gameModel
+	 * @param tileManager
 	 * @param x
 	 * @param y
 	 * @param type
@@ -75,15 +128,11 @@ public class Tile {
 	}
 
 	public static Tile dummyTile() {
-		if(dummyTile == null) {
-			// never use other methods on dummyTiles
-			dummyTile = new Tile(null, -1, -1, null);
-		}
 		return dummyTile;
 	}
 
 	public static boolean isDummyTile(Tile t) {
-		return t.equals(dummyTile);
+		return dummyTile.equals(t);
 	}
 	
 	public Type getType() {
@@ -104,11 +153,11 @@ public class Tile {
 	
 	/**
 	 * Returns the tile in the given direction.<br>
-	 * Check if it's valid using Tile.isDummyTile() first!
+	 * Never returns null. Check if it's valid using Tile.isDummyTile() first!
 	 * @param dir Direction from this tile
 	 * @return Tile in that direction
 	 */
-	public Tile getNeighbour(Direction dir) {
+	public Tile tryGetNeighbour(Direction dir) {
 		switch(dir) {
 		case NORTH:
 			return manager.getTile(x, y + 1);
@@ -125,6 +174,17 @@ public class Tile {
 	}
 	
 	/**
+	 * Returns the tile in the given direction.<br>
+	 * Returns null if there isn't a neighbour there.
+	 * @param dir
+	 * @return
+	 */
+	public Tile getNeighbour(Direction dir) {
+		Tile t = tryGetNeighbour(dir);
+		return Tile.isDummyTile(t) ? null : t;
+	}
+	
+	/**
 	 * Returns up to 4 Tiles, which are the tiles in each direction.<br>
 	 * Check if it's valid using Tile.isDummyTile() first!
 	 * @return Tiles in all 4 directions
@@ -133,7 +193,7 @@ public class Tile {
 		// TODO double check if we need a getNeighbours for non-network tiles
         ArrayList<Tile> available = new ArrayList<Tile>();
         for (Direction dir : Direction.values()) {
-        	available.add(getNeighbour(dir));
+        	available.add(tryGetNeighbour(dir));
         }
         return available;
     }
@@ -141,7 +201,7 @@ public class Tile {
 	public boolean isNeighbour(Tile t) {
 		// TODO double check if we need a isNeighbour for network tiles
 		for (Direction dir : Direction.values()) {
-			if (t.equals(getNeighbour(dir))) {
+			if (t.equals(tryGetNeighbour(dir))) {
 				return true;
 			}
 		}
@@ -200,7 +260,7 @@ public class Tile {
 
 		// Network data
 		for(Direction dir: Direction.values()) {
-			Tile neighbour = getNeighbour(dir);
+			Tile neighbour = tryGetNeighbour(dir);
 			if(Tile.isDummyTile(neighbour)) {
 				query.append("No ");
 				query.append(dir.name());
@@ -254,7 +314,7 @@ public class Tile {
 	 */
 	@Override
 	public int hashCode() {
-		return x * manager.width + y;
+		return (manager == null) ? -1 : x * manager.width + y;
 	}
 
 	/**
@@ -275,6 +335,6 @@ public class Tile {
 	 */
 	@Override
 	public String toString() {
-		return "Tile " + Utils.pCoords(x, y);
+		return "Tile " + pCoords(x, y);
 	}
 }

@@ -3,8 +3,8 @@ package com.left.addd.utils;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 public class TexturePackerTool {
-	private static final String RAW_DIR = "raw/";
-	private static final String ASSETS_DIR = "../Template-android/assets/";
+	private static final String RAW_DIR = "rawassets/";
+	private static final String ASSETS_DIR = "../addd-android/assets/";
 	
 	public static void main(String[] args) {
 		String inputDir = RAW_DIR;

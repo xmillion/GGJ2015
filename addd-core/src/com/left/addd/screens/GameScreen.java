@@ -48,7 +48,7 @@ public class GameScreen extends AbstractScreen {
 	public void render(float delta) {
 		SpriteBatch batch = getBatch();
 		// Draw the views
-		Gdx.gl.glClearColor(0.2f, 0.6f, 0.8f, 1f);
+		Gdx.gl.glClearColor(0.12f, 0.1f, 0.1f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		if(uiView.getState() == UIView.State.RUNNING) {
@@ -61,7 +61,6 @@ public class GameScreen extends AbstractScreen {
 				gameView.render(batch, delta);
 				break;
 			case FASTER:
-				// TODO set actual speeds
 				gameModel.update(delta * 2);
 				gameView.render(batch, delta * 2);
 				break;

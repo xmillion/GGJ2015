@@ -60,9 +60,16 @@ entities/school
   orig: 64, 64
   offset: 0, 0
   index: -1
-entities/young
+entities/tile
   rotate: false
   xy: 138, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+entities/young
+  rotate: false
+  xy: 200, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -102,6 +109,13 @@ tiles/path
   offset: 0, 0
   index: -1
 tiles/road
+  rotate: false
+  xy: 136, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+tiles/road-o
   rotate: false
   xy: 136, 68
   size: 32, 32
