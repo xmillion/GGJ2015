@@ -6,7 +6,7 @@
 hs_err_pid*
 
 ## Game specific
-assets/data/
+#assets/data/
 
 ## GWT
 war/WEB-INF/deploy/
