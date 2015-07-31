@@ -2,36 +2,41 @@ package com.left.addd.model;
 
 public class Time {
 	/**
-	 * in game time units (hours)
+	 * in game time units (minutes)
 	 */
-	private long hours;
+	private long minutes;
 	/**
 	 * Real time units (seconds)
 	 */
 	private float realTime;
 	// Conversion factor:
-	// 1 seconds = 1 hour in game
-	private static final float CONVERSION = 1;
+	// 2 seconds = 3*10 minutes in game
+	private static final float CONVERSION = 2/3f;
+	private static final int TICKRATE = 10;
 	
 	public Time() {
 		this(0);
 	}
 	
 	public Time(long time) {
-		this.hours = time;
+		this.minutes = time;
 		this.realTime = 0;
 	}
 	
 	public long getTime() {
-		return hours;
+		return minutes;
+	}
+	
+	public long getMinute() {
+		return minutes % 60;
 	}
 	
 	public long getHour() {
-		return hours % 24;
+		return (minutes / 60) % 24;
 	}
 	
 	public long getDay() {
-		return hours / 24;
+		return minutes / 1440;
 	}
 	
 	/**
@@ -43,7 +48,7 @@ public class Time {
 		realTime += delta;
 		int ticks = 0;
 		if(realTime > CONVERSION) {
-			hours++;
+			minutes+=TICKRATE;
 			ticks++;
 			realTime -= CONVERSION;
 		}
