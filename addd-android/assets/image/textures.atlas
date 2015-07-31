@@ -1,75 +1,131 @@
 
 textures.png
-size: 256,128
+size: 1024,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+entities/BlueIdle
+  rotate: false
+  xy: 2, 204
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/BlueMoving
+  rotate: false
+  xy: 2, 170
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/GreenIdle
+  rotate: false
+  xy: 388, 204
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/GreenMoving
+  rotate: false
+  xy: 2, 136
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/RedIdle
+  rotate: false
+  xy: 388, 170
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/RedMoving
+  rotate: false
+  xy: 2, 102
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/YellowIdle
+  rotate: false
+  xy: 388, 136
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
+entities/YellowMoving
+  rotate: false
+  xy: 2, 68
+  size: 384, 32
+  orig: 384, 32
+  offset: 0, 0
+  index: -1
 entities/blueshirt
   rotate: false
-  xy: 2, 2
+  xy: 774, 138
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 entities/factory
   rotate: false
-  xy: 2, 36
+  xy: 774, 172
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 entities/house
   rotate: false
-  xy: 200, 68
+  xy: 840, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 entities/library
   rotate: false
-  xy: 68, 36
+  xy: 388, 70
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 entities/main
   rotate: false
-  xy: 36, 2
+  xy: 454, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 entities/old
   rotate: false
-  xy: 70, 2
+  xy: 68, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 entities/redshirt
   rotate: false
-  xy: 104, 2
+  xy: 874, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 entities/school
   rotate: false
-  xy: 134, 36
+  xy: 2, 2
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 entities/tile
   rotate: false
-  xy: 138, 2
+  xy: 488, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 entities/young
   rotate: false
-  xy: 200, 34
+  xy: 102, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
