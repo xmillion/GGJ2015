@@ -57,6 +57,7 @@ public class UIView implements Disposable {
 	private Table loadMenu;
 	private Table timeTable;
 	private Label date;
+	private final String DATE_FORMAT = "Day %d, %02d:%d0";
 
 	private TextureRegionDrawable pauseBackground;
 	private TextureRegionDrawable timeBackground;
@@ -454,9 +455,7 @@ public class UIView implements Disposable {
 	public void render(float delta) {
 		// Get game info
 		Time time = gameView.getModel().getTime();
-		long hour = time.getHour();
-		long day = time.getDay();
-		date.setText("Day " + day + ", " + hour + ":00");
+		date.setText(String.format(DATE_FORMAT, time.getDay(), time.getHour(), time.getTenMinutes()));
 		
 		// Update
 		stage.act(delta);

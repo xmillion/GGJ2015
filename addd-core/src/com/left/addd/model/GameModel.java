@@ -29,8 +29,8 @@ public class GameModel {
 	/**
 	 * For serializer use only! It's incomplete.
 	 */
-	private GameModel(long timeInHours) {
-		this.time = new Time(timeInHours);
+	private GameModel(long timeInMinutes) {
+		this.time = new Time(timeInMinutes);
 	}
 	
 	/**
@@ -44,22 +44,22 @@ public class GameModel {
 	
 	/**
 	 * Generate a GameModel with predefined parts.
-	 * @param timeInHours In game time
+	 * @param timeInMinutes In game time
 	 * @param tiles Pre-generated Tiles
 	 * @param entities Pre-defined Entities
 	 */
-	public GameModel(long timeInHours, Tile[][] tiles, List<Entity> entities) {
-		this(timeInHours, new TileManager(tiles), new EntityManager(entities));
+	public GameModel(long timeInMinutes, Tile[][] tiles, List<Entity> entities) {
+		this(timeInMinutes, new TileManager(tiles), new EntityManager(entities));
 	}
 	
 	/**
 	 * Full constructor.
-	 * @param timeInHours
+	 * @param timeInMinutes
 	 * @param tileManager
 	 * @param entityManager
 	 */
-	private GameModel(long timeInHours, TileManager tileManager, EntityManager entityManager) {
-		this.time = new Time(timeInHours);
+	private GameModel(long timeInMinutes, TileManager tileManager, EntityManager entityManager) {
+		this.time = new Time(timeInMinutes);
 		this.tileManager = tileManager;
 		this.entityManager = entityManager;
 	}
@@ -229,8 +229,8 @@ public class GameModel {
 	}
 
 	public static GameModel load(JsonValue jsonData) {
-		long timeInHours = jsonData.getLong("time");
-		GameModel gameModel = new GameModel(timeInHours);
+		long timeInMinutes = jsonData.getLong("time");
+		GameModel gameModel = new GameModel(timeInMinutes);
 		gameModel.tileManager = TileManager.load(jsonData, gameModel);
 		gameModel.entityManager = EntityManager.load(jsonData, gameModel);
 		return gameModel;
