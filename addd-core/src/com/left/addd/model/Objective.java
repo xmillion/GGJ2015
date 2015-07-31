@@ -127,6 +127,10 @@ public class Objective {
 		return target;
 	}
 	
+	public boolean hasTarget() {
+		return target != null;
+	}
+	
 	public int getRequiredItemAmount(String itemName) {
 		if (requiredItems.containsKey(itemName)) {
 			return requiredItems.get(itemName);

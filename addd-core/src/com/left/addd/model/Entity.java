@@ -13,11 +13,17 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.left.addd.utils.LoadingException;
 import com.left.addd.utils.Res;
 
+/**
+ * Represents an in game object that is rendered and can interact with other Entities.
+ */
 public class Entity {
 
 	public final long id;
 	private String name;
 	private String description;
+	/**
+	 * This entity currently occupies this tile.
+	 */
 	protected Tile tile;
 	/**
 	 * An entity's inventory consists of items identified with strings, with quantity as the value in a map.
@@ -196,7 +202,7 @@ public class Entity {
 	}
 	
 	public void update(int ticks) {
-		// Nothing here but subclasses can override.
+		// No work needed here. EntityManager is doing the neighbouring Entity interactions for us.
 	}
 	
 	// *** Serialization ***

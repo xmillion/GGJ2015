@@ -7,6 +7,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.left.addd.utils.Res;
 
+/**
+ * Represents entities that don't move, and can occupy more than one tile.
+ */
 public class Building extends Entity {
 
 	public enum Type {

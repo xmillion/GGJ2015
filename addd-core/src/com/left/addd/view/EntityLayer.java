@@ -77,11 +77,11 @@ public class EntityLayer {
 		
 		// redraw special entities
 		if (hoveredEntity != null) {
-			renderEntity(batch, delta, hoveredEntity, hoverColor);
+			renderEntity(batch, 0, hoveredEntity, hoverColor);
 		}
 		
 		if (selectedEntity != null) {
-			renderEntity(batch, delta, selectedEntity, selectColor);
+			renderEntity(batch, 0, selectedEntity, selectColor);
 		}
 	}
 

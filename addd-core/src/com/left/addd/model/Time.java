@@ -45,7 +45,7 @@ public class Time {
 	/**
 	 * Updates in game time.
 	 * @param delta Real time passed in seconds.
-	 * @return number of in game days passed within the real time.
+	 * @return number of in game minutes passed within the real time.
 	 */
 	public int update(float delta) {
 		realTime += delta;

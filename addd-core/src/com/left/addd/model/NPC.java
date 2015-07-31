@@ -16,24 +16,35 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.left.addd.utils.LoadingException;
 import com.left.addd.utils.Res;
 
+/**
+ * An Entity that can also move.<br>
+ * NPCs that have targets will find a path to the target and move along it.<br>
+ * It's modeled so the NPC waits a certain amount of time (it's "speed"), then instantly goes to the adjacent tile.<br>
+ * Visually, the sprite will be dragged towards its current tile at a constant velocity, meaning it doesn't draw a transition state.<br>
+ * This avoids any interpolation and jarring sprite transforms. Inspired by troop movement in EU4.
+ */
 public class NPC extends Entity {
 	
 	public enum Type {
-		NONE(1, "main"),
-		HERO(0.2f, "old"),
-		POLICE(1/3f, "redshirt"),
-		FACULTY(1/7f, "blueshirt"),
-		STUDENT(0.5f, "young");
+		NONE(60, "main"),
+		HERO(30, "old"),
+		POLICE(90, "redshirt"),
+		FACULTY(120, "blueshirt"),
+		STUDENT(20, "young");
 		
-		public final float moveSpeed;
+		/** Number of minutes to move by one tile */
+		public final int moveSpeed;
 		public final String assetName;
-		private Type(float moveSpeed, String assetName) {
+		private Type(int moveSpeed, String assetName) {
 			this.moveSpeed = moveSpeed;
 			this.assetName = assetName;
 		}
 	}
 
 	public final Type type;
+	
+	// Pathfinding
+	
 	/** If not null, try to move to this entity. */
 	private Entity targetEntity;
 	/** Cache the target's position */
@@ -42,13 +53,22 @@ public class NPC extends Entity {
 	private Deque<Tile> path;
 	/** Cache the neighbouring tile for movement. */
 	private Tile nextTile;
-	/** Cache the direction of the neighbouring tile. */
-	private Direction nextDirection;
-	/** The speed of this NPC is measured in tiles per second (real time) */
-	private float moveSpeed;
-	/** The progress of this NPC's movement, from 0 (start) to 1 (complete). -1 when it's not moving. */
-	private float moveProgress;
-	/** Floating point form of its current tile, to account for movement. */
+	
+	// Move animations
+	
+	/** Number of minutes to move by one tile. */
+	private int moveSpeed;
+	/** Remaining time before move can take place. */
+	private int moveTimer;
+	/** Flag to indicate arrival. */
+	private boolean justArrived;
+	/** Amount of time given for a move animation. */
+	private static final float MOVE_ANIMATION_TIME = 1f;
+	/** Remaining time for move animation. */
+	private float moveAnimationTimer;
+	/** Direction of move animation */
+	private Direction moveAnimationDirection;
+	/** Current position of NPC during movement in fractional Tile coordinates. */
 	private Vector2 tileCoordinate;
 
 	public NPC(Tile tile, Type type) {
@@ -75,7 +95,9 @@ public class NPC extends Entity {
 		this.path = new LinkedList<Tile>();
 		this.nextTile = tile;
 		this.moveSpeed = type.moveSpeed;
-		this.moveProgress = -1;
+		this.moveTimer = 0;
+		this.justArrived = false;
+		this.moveAnimationTimer = 0;
 		this.tileCoordinate = new Vector2(tile.x, tile.y);
 	}
 	
@@ -103,33 +125,20 @@ public class NPC extends Entity {
 	public Tile getNextTile() {
 		return nextTile;
 	}
+	
+	public Direction getMoveDirection() {
+		return moveAnimationDirection;
+	}
 
-	/**
-	 * Gets the move rate in real time.
-	 * @return
-	 */
-	public float getMoveSpeed() {
+	public int getMoveSpeed() {
 		return moveSpeed;
 	}
 
 	/**
-	 * Sets the move rate in real time.
-	 * @param speed
+	 * @param speed New move speed
 	 */
-	public void setMoveSpeed(float speed) {
+	public void setMoveSpeed(int speed) {
 		this.moveSpeed = speed;
-	}
-
-	/**
-	 * Gets the move progress in real time.
-	 * @return
-	 */
-	public float getMoveProgress() {
-		return moveProgress;
-	}
-	
-	public Direction getMoveDirection() {
-		return nextDirection;
 	}
 	
 	public Vector2 getTileCoordinate() {
@@ -138,98 +147,128 @@ public class NPC extends Entity {
 	
 	public boolean isMoving() {
 		// All of the following are true if this is moving:
+		// !tile.equals(nextTile);
 		// targetEntity != null;
 		// !path.isEmpty();
-		// moveProgress < 0;
-		return nextDirection != null;
+		return moveTimer > 0;
 	}
 	
 	// *** Movement ***
 	
 	/**
-	 * Stop moving and remove the current path.
+	 * Stop moving. Remove target and path.
 	 */
 	public void stop() {
 		targetEntity = null;
+		targetTile = null;
 		path.clear();
 		nextTile = tile;
-		nextDirection = null;
-		moveProgress = -1;
+		moveTimer = 0;
+	}
+	
+	@Override
+	public void interact(Entity target) {
+		super.interact(target);
+		if (targetEntity != null && targetEntity.equals(target)) {
+			// I just interacted with the target.
+			if (targetEntity.tile.equals(targetTile)) {
+				// I'm about to move into the same Tile as the target. Don't do that.
+				stop();
+			}
+		}
 	}
 	
 	/**
-	 * Start moving towards the current target if there is one.
+	 * Update the model.
+	 * @param ticks
 	 */
-	public void start() {
-		// If this is called mid-move, I think it'll jitter.
-		if (tile.equals(nextTile)) {
-			// It's not moving, lets see if it should be moving.
+	@Override
+	public void update(int ticks) {
+		super.update(ticks);
+		if (moveTimer > 0) {
+			// I am moving.
+			moveTimer -= ticks;
+			justArrived = true;
+		} else {
+			// I am idle.
+			if (justArrived) {
+				// I just arrived at my next tile.
+				moveAnimationTimer = MOVE_ANIMATION_TIME;
+				moveAnimationDirection = tile.getDirection(nextTile);
+				tile = nextTile;
+				justArrived = false;
+			}
+			
+			// Should I move?
 			if (targetEntity == null) {
-				// Actively move towards the next objective with a target if possible.
+				// I have no destination. Look for one.
 				for (Objective obj: getObjectives()) {
-					if (!obj.isTargetComplete(this)) {
+					if (obj.hasTarget())
+					{
 						log(getName(), getObjectives().size() + " objectives. Next up is " + obj.getTarget().getName());
 						targetEntity = obj.getTarget();
 						findPathToTarget();
 						break;
 					}
 				}
-			} else if (!path.isEmpty() && targetTile.equals(targetEntity.tile)) {
-				// Continue along the path.
-				nextTile = path.poll();
-				if (!tile.equals(nextTile)) {
-					nextDirection = tile.getDirection(nextTile);
-					moveProgress = 0;
-				}
-			} else {
-				// Regenerate a path and use it.
-				path.clear();
+			} else if (!targetEntity.tile.equals(targetTile)) {
+				// My target moved so I have to find a new path.
 				findPathToTarget();
 			}
-		}
-	}
-	
-	@Override
-	public void update(int ticks) {
-		super.update(ticks);
-		if (nextDirection == null) {
-			// Start the next move.
-			start();
+			
+			if (!path.isEmpty()) {
+				// I now have a destination. Start going to it.
+				nextTile = path.poll();
+				if (!tile.equals(nextTile)) {
+					moveTimer = moveSpeed;
+				}
+			} else {
+				// I have nothing to do.
+				moveAnimationDirection = null;
+			}
 		}
 	}
 	
 	/**
-	 * Render function for more fluid movement.
+	 * Render the sprite. The draw position of the sprite is separate from the NPC's current tile
 	 * @param delta
 	 */
 	public void render(float delta) {
-		if (nextDirection != null) {
-			moveProgress += delta * moveSpeed;
-			if (moveProgress > 1.0f) {
-				// finish moving.
-				tile = nextTile;
-				nextDirection = null;
-				moveProgress = -1;
-				tileCoordinate.set(tile.x, tile.y);
-			} else {
+		if (moveAnimationTimer > 0) {
+			// I need to move the sprite.
+			if (moveAnimationDirection != null) {
+				// Move towards current tile
 				float moveX = tile.x;
 				float moveY = tile.y;
-				switch(nextDirection) {
+				switch(moveAnimationDirection) {
 				case NORTH:
-					moveY += moveProgress;
+					moveY -= moveAnimationTimer;
 					break;
 				case EAST:
-					moveX += moveProgress;
+					moveX -= moveAnimationTimer;
 					break;
 				case SOUTH:
-					moveY -= moveProgress;
+					moveY += moveAnimationTimer;
 					break;
 				case WEST:
-					moveX -= moveProgress;
+					moveX += moveAnimationTimer;
 					break;
 				}
 				tileCoordinate.set(moveX, moveY);
+			} else {
+				tileCoordinate.set(tile.x, tile.y);
 			}
+			
+			moveAnimationTimer -= delta;
+		} else {
+			// The sprite is where I actually am.
+			tileCoordinate.set(tile.x, tile.y);
+		}
+		
+		if (moveTimer > 0) {
+			// I am in the process of moving. Draw the move animation in place.
+		} else {
+			// I am idle. Draw the idle animation
 		}
 	}
 	
@@ -238,15 +277,20 @@ public class NPC extends Entity {
 	/**
 	 * Update this.path using pathfinding algorithm.
 	 * Ensure that targetEntity != null before calling this.
+	 * @pre targetEntity != null
+	 * @post targetTile is correct
+	 * @post path is correct
 	 */
 	private void findPathToTarget() {
 		if (tile.equals(targetEntity.tile)) {
 			// we're already here.
+			path.clear();
 			targetEntity = null;
 			return;
 		}
 		
 		targetTile = targetEntity.tile;
+		path.clear();
 		int stepsTaken = 0;
 		boolean success = false;
 		Node currentNode = new Node(tile, targetTile, stepsTaken, null);
@@ -256,7 +300,6 @@ public class NPC extends Entity {
 		searchList.add(currentNode);
 		while (searchList.size() > 0) {
 			currentNode = searchList.poll();
-			// just being in a neighbouring tile is close enough for entity interaction.
 			if (targetTile.equals(currentNode.tile)) {
 				success = true;
 				break;
@@ -285,7 +328,7 @@ public class NPC extends Entity {
 				}
 			}
 		} else {
-			// FAILURE
+			// I can't find a path.
 			stop();
 		}
 	}
